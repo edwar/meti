@@ -66,6 +66,16 @@ export default function DashboardLayout({
           return;
         }
         setUser(data.user);
+        // Verificar rol: cliente puede estar en dashboard
+        const role = (data.user as any).role;
+        if (role === "ADMIN") {
+          router.push("/admin");
+          return;
+        }
+        if (role === "ADVISOR") {
+          router.push("/advisor");
+          return;
+        }
       } catch (error) {
         router.push("/login");
       } finally {

@@ -72,6 +72,12 @@ export default function AdvisorLayout({
           return;
         }
         setUser(data.user);
+        // Verificar rol: solo asesor o admin pueden estar aquí
+        const role = (data.user as any).role;
+        if (role !== "ADVISOR" && role !== "ADMIN") {
+          router.push("/dashboard");
+          return;
+        }
       } catch (error) {
         router.push("/login");
       } finally {

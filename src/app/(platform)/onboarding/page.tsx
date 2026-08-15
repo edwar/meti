@@ -283,8 +283,8 @@ export default function OnboardingPage() {
             <p className="text-sm text-[var(--text-muted)]">
               Mientras tanto, puedes explorar la plataforma como cliente.
             </p>
-            <Button className="mt-6" onClick={() => router.push("/dashboard")}>
-              Ir al Dashboard
+            <Button className="mt-6" onClick={() => router.push("/advisor")}>
+              Ir al Panel de Asesor
             </Button>
           </CardContent>
         </Card>

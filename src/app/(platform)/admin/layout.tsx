@@ -72,7 +72,12 @@ export default function AdminLayout({
           router.push("/login");
           return;
         }
-        // TODO: Check if user is admin
+        // Solo admin puede estar aquí
+        const role = (data.user as any).role;
+        if (role !== "ADMIN") {
+          router.push(role === "ADVISOR" ? "/advisor" : "/dashboard");
+          return;
+        }
         setUser(data.user);
       } catch (error) {
         router.push("/login");

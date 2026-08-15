@@ -1,23 +1,17 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Rutas que no requieren autenticación
+// Rutas públicas (no requieren sesión)
 const publicRoutes = [
   "/",
   "/login",
   "/register",
+  "/redirect",
   "/api/auth",
   "/services",
+  "/privacy",
+  "/terms",
 ];
-
-// Rutas de admin
-const adminRoutes = ["/admin"];
-
-// Rutas de advisor
-const advisorRoutes = ["/advisor"];
-
-// Rutas de client
-const clientRoutes = ["/client", "/checkout", "/call"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -27,29 +21,31 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Permitir archivos estáticos y API routes de auth
+  // Permitir archivos estáticos y assets
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
+    pathname.startsWith("/logo") ||
     pathname.includes(".")
   ) {
     return NextResponse.next();
   }
 
-  // Para otras rutas, permitir que better-auth maneje la sesión
-  // El middleware de better-auth se encargará de la verificación
+  // Verificar si hay sesión (cookie presente)
+  const sessionCookie = request.cookies.get("better-auth.session_token");
+  if (!sessionCookie) {
+    // Sin sesión: checkout y call son públicos
+    if (pathname.startsWith("/checkout") || pathname.startsWith("/call")) {
+      return NextResponse.next();
+    }
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
