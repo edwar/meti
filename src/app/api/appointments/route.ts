@@ -65,10 +65,10 @@ export async function POST(request: NextRequest) {
       feePercentage = advisorCategories[0].category.feePercentage;
     }
 
-    // Calculate prices — descuento se aplica antes del fee
-    const priceAfterDiscount = Math.max(service.priceCents - discountCents, 0);
-    const advisorEarning = priceAfterDiscount;
-    const platformFee = Math.round(advisorEarning * (feePercentage / 100));
+    // Calculate prices — el fee SIEMPRE se calcula sobre el precio ORIGINAL
+    // (el descuento lo absorbe el asesor, la plataforma mantiene su comisión)
+    const advisorEarning = Math.max(service.priceCents - discountCents, 0);
+    const platformFee = Math.round(service.priceCents * (feePercentage / 100));
     const totalCents = advisorEarning + platformFee;
 
     // Parsear fecha/hora local (Colombia) del ISO y construir el timestamp UTC

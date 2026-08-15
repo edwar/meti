@@ -53,7 +53,8 @@ function CheckoutContent() {
       : Math.min(Math.round(promotion.discountValue * 100), servicePrice)
     : 0;
   const priceAfterDiscount = Math.max(servicePrice - discountCents, 0);
-  const serviceFee = Math.round(priceAfterDiscount * 0.15);
+  // El fee siempre se calcula sobre el precio ORIGINAL (el descuento lo absorbe el asesor)
+  const serviceFee = Math.round(servicePrice * 0.15);
   const serviceTotal = priceAfterDiscount + serviceFee;
 
   useEffect(() => {
