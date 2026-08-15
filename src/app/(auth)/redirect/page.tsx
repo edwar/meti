@@ -45,40 +45,36 @@ export default function RedirectPage() {
           return;
         }
 
-        // Si no hay ningún admin, el primer usuario debe pasar por onboarding
-        // para poder elegir ser admin (el default CLIENT lo saltaría directo al dashboard)
         const user = data.user as any;
+
+        // Primer usuario del sistema → automáticamente admin
         if (user.role === "CLIENT") {
           try {
             const res = await fetch("/api/admin/setup");
             const { hasAdmins } = await res.json();
             if (!hasAdmins) {
-              router.push("/onboarding");
+              await fetch("/api/admin/setup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: user.id }),
+              });
+              router.push("/admin");
               return;
             }
           } catch {}
         }
 
         // Redirect based on role
-        if (user.role) {
-          switch (user.role) {
-            case "ADMIN":
-              router.push("/admin");
-              break;
-            case "ADVISOR":
-              router.push("/advisor");
-              break;
-            case "CLIENT":
-              router.push("/dashboard");
-              break;
-            default:
-              router.push("/dashboard");
-          }
-          return;
+        switch (user.role) {
+          case "ADMIN":
+            router.push("/admin");
+            break;
+          case "ADVISOR":
+            router.push("/advisor");
+            break;
+          default:
+            router.push("/dashboard");
         }
-
-        // New user
-        router.push("/onboarding");
       } catch (error) {
         router.push("/login");
       }

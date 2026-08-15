@@ -504,39 +504,15 @@ export default function OnboardingPage() {
               ¡Bienvenido a Meti!
             </CardTitle>
             <CardDescription>
-              Hola {user.name}, {hasAdmins ? "¿Cómo quieres usar la plataforma?" : "Parece que eres el primero. Elige tu rol:"}
+              Hola {user.name}, ¿qué quieres hacer en Meti?
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            {/* Option: Admin */}
-            {!hasAdmins && (
-              <button
-                onClick={handleBecomeAdmin}
-                disabled={isSettingUp}
-                className="w-full p-4 rounded-xl border-2 border-[var(--primary)] bg-[var(--primary-light)] hover:bg-[var(--primary)]/10 transition-all text-left group"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[var(--primary)] flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-heading font-semibold text-[var(--text-primary)]">
-                      Administrador
-                    </h3>
-                    <p className="text-sm text-[var(--text-muted)]">
-                      Control total de la plataforma.
-                    </p>
-                  </div>
-                  <ArrowRight className="w-5 h-5 text-[var(--primary)] mt-1" />
-                </div>
-              </button>
-            )}
-
             {/* Option: Advisor */}
             <button
               onClick={() => setStep("categories")}
               disabled={isSettingUp}
-              className="w-full p-4 rounded-xl border border-[var(--accent)] bg-[var(--accent-light)] hover:bg-[var(--accent)]/10 transition-all text-left group"
+              className="w-full p-4 rounded-xl border-2 border-[var(--accent)] bg-[var(--accent-light)] hover:bg-[var(--accent)]/10 transition-all text-left group"
             >
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-xl bg-[var(--accent)] flex items-center justify-center flex-shrink-0">
@@ -544,19 +520,19 @@ export default function OnboardingPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-heading font-semibold text-[var(--text-primary)]">
-                    Asesor
+                    Ser Asesor
                   </h3>
                   <p className="text-sm text-[var(--text-muted)]">
-                    Ofrece tus servicios. Requiere verificación.
+                    Ofrece tus servicios profesionales. Requiere verificación de documentos.
                   </p>
                 </div>
                 <ArrowRight className="w-5 h-5 text-[var(--accent)] mt-1" />
               </div>
             </button>
 
-            {/* Option: Client */}
+            {/* Option: Client — default */}
             <button
-              onClick={handleBecomeClient}
+              onClick={() => router.push("/dashboard")}
               disabled={isSettingUp}
               className="w-full p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--secondary)] transition-all text-left group"
             >
@@ -572,7 +548,7 @@ export default function OnboardingPage() {
                     Busca y agenda asesorías con profesionales.
                   </p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-[var(--text-muted)] mt-1" />
+                <ArrowRight className="w-5 h-5 text-[var(--text-muted)]" />
               </div>
             </button>
           </CardContent>
