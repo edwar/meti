@@ -9,7 +9,9 @@ import { parseLocalISO } from "@/lib/timezone";
 const appointmentSchema = z.object({
   advisorId: z.string(),
   serviceId: z.string(),
-  scheduledAt: z.string().datetime(),
+  // Fecha/hora local (Colombia) en formato YYYY-MM-DDTHH:MM:SS sin offset.
+  // El servidor la interpreta con la timezone de la app (ver parseLocalISO).
+  scheduledAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/),
 });
 
 // POST: Create appointment (PENDING) + Mercado Pago Checkout Pro preference

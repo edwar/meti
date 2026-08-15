@@ -127,7 +127,9 @@ function CheckoutContent() {
         body: JSON.stringify({
           advisorId,
           serviceId,
-          scheduledAt: new Date(`${date}T${time}`).toISOString(),
+          // Enviar hora local (Colombia) SIN convertir a UTC: el servidor la interpreta
+          // con la timezone de la app. Evita doble conversión de timezone.
+          scheduledAt: `${date}T${time}:00`,
         }),
       });
 
