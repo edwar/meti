@@ -40,9 +40,9 @@ export async function notifyAppointmentConfirmed(appointmentId: string): Promise
   let sent = false;
   if (apt.client.email) sent = (await sendBookingConfirmedEmail(clientEmail, base)) || sent;
 
-  // Asesor usa /advisor en vez de /dashboard
+  // Asesor usa /advisor/schedule
   if (apt.advisor.user.email) {
-    const advisorBase = { ...base, appointmentUrl: `${getAppUrl()}/advisor` };
+    const advisorBase = { ...base, appointmentUrl: `${getAppUrl()}/advisor/schedule` };
     sent = (await sendNewBookingEmail(advisorEmail, advisorBase)) || sent;
   }
   return sent;
@@ -66,7 +66,7 @@ export async function notifyAppointmentReminder(appointmentId: string): Promise<
   if (apt.client.email) sent = (await sendReminderEmail(apt.client.email, base, "cliente")) || sent;
 
   if (apt.advisor.user.email) {
-    const advisorBase = { ...base, appointmentUrl: `${getAppUrl()}/advisor` };
+    const advisorBase = { ...base, appointmentUrl: `${getAppUrl()}/advisor/schedule` };
     sent = (await sendReminderEmail(apt.advisor.user.email, advisorBase, "asesor")) || sent;
   }
   return sent;
