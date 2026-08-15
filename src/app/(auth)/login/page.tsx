@@ -12,17 +12,15 @@ function LoginContent() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const checkSession = async () => {
       try {
         const { data } = await authClient.getSession();
-        if (data) {
-          router.push("/redirect");
-        }
-      } catch (error) {
-        // Not logged in
-      }
+        if (data) router.push("/redirect");
+      } catch (error) {}
     };
     checkSession();
   }, [router]);
@@ -30,14 +28,30 @@ function LoginContent() {
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     setError(null);
-
     try {
-      await authClient.signIn.social({
-        provider: "google",
-        callbackURL: "/redirect",
-      });
+      await authClient.signIn.social({ provider: "google", callbackURL: "/redirect" });
     } catch (err) {
       setError("Error al iniciar sesión con Google. Intenta de nuevo.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { error: signInError } = await authClient.signIn.email({
+        email,
+        password,
+        callbackURL: "/redirect",
+      });
+      if (signInError) {
+        setError(signInError.message || "Email o contraseña incorrectos.");
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setError("Error al iniciar sesión. Intenta de nuevo.");
       setIsLoading(false);
     }
   };
@@ -46,29 +60,18 @@ function LoginContent() {
     <div className="space-y-6">
       <div className="text-center">
         <Link href="/" className="inline-flex items-center gap-2">
-              <img src="/logo-wordmark.svg" alt="Meti" className="h-10 w-auto mx-auto" />
-          <span className="font-heading font-bold text-3xl text-[var(--secondary)]">
-            Meti
-          </span>
+          <img src="/logo-wordmark.svg" alt="Meti" className="h-10 w-auto mx-auto" />
         </Link>
       </div>
 
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl font-heading">
-            Bienvenido de vuelta
-          </CardTitle>
-          <CardDescription>
-            Inicia sesión para acceder a tu cuenta
-          </CardDescription>
+          <CardTitle className="text-xl font-heading">Bienvenido de vuelta</CardTitle>
+          <CardDescription>Inicia sesión para acceder a tu cuenta</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button
-            variant="secondary"
-            className="w-full h-12 text-base"
-            onClick={handleGoogleLogin}
-            disabled={isLoading}
-          >
+          {/* Google Button */}
+          <Button variant="secondary" className="w-full h-12 text-base" onClick={handleGoogleLogin} disabled={isLoading}>
             {isLoading ? (
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 border-2 border-[var(--border)] border-t-[var(--primary)] rounded-full animate-spin" />
@@ -87,12 +90,7 @@ function LoginContent() {
             )}
           </Button>
 
-          {error && (
-            <div className="p-3 rounded-lg bg-[var(--error-light)] text-[var(--error)] text-sm text-center">
-              {error}
-            </div>
-          )}
-
+          {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-[var(--border)]" />
@@ -102,6 +100,36 @@ function LoginContent() {
             </div>
           </div>
 
+          {/* Email/Password Form */}
+          <form onSubmit={handleEmailLogin} className="space-y-3">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full h-11 px-3 border border-[var(--border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)]"
+            />
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full h-11 px-3 border border-[var(--border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)]"
+            />
+            <Button type="submit" className="w-full h-11" disabled={isLoading}>
+              {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
+            </Button>
+          </form>
+
+          {error && (
+            <div className="p-3 rounded-lg bg-[var(--error-light)] text-[var(--error)] text-sm text-center">
+              {error}
+            </div>
+          )}
+
+          {/* Register Link */}
           <p className="text-center text-sm text-[var(--text-muted)]">
             ¿No tienes una cuenta?{" "}
             <Link href="/register" className="font-medium text-[var(--primary)] hover:underline">
