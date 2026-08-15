@@ -85,8 +85,19 @@ export default function OnboardingPage() {
         }
 
         const userWithRole = data.user as any;
-        
-        // If user already has a role assigned, redirect to appropriate panel
+
+        // Si no hay ningún admin, mostrar onboarding siempre
+        // para que el primer usuario pueda elegir ser admin
+        try {
+          const adminRes = await fetch("/api/admin/setup");
+          const { hasAdmins } = await adminRes.json();
+          if (!hasAdmins) {
+            setIsLoading(false);
+            return; // Mostrar onboarding
+          }
+        } catch {}
+
+        // Si ya hay admins y el usuario tiene rol, redirigir al panel correspondiente
         if (userWithRole.role) {
           switch (userWithRole.role) {
             case "ADMIN":
