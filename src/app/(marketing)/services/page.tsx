@@ -13,11 +13,6 @@ import { RatingStars } from "@/components/ui/rating-stars";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import {
   Search,
-  Filter,
-  MapPin,
-  Star,
-  Clock,
-  ArrowRight,
   Briefcase,
 } from "lucide-react";
 
@@ -99,9 +94,9 @@ export default function ServicesPage() {
   if (isLoading) return <LoadingPage />;
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[var(--secondary)] to-[var(--secondary-light)] text-white py-12">
+      <section className="bg-linear-to-br from-secondary to-secondary-light text-white py-12">
         <div className="container-meti">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="font-heading text-3xl md:text-4xl font-bold mb-4">
@@ -113,17 +108,17 @@ export default function ServicesPage() {
 
             {/* Search Bar */}
             <div className="relative max-w-xl mx-auto">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-muted)]" />
-              <input
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+              <Input
                 type="text"
                 placeholder="Buscar por nombre, especialidad o rubro..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                className="w-full h-14 pl-12 pr-4 bg-white rounded-xl text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                className="w-full h-14 pl-12 pr-4 bg-white rounded-xl text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <Button
-                className="absolute right-2 top-1/2 -translate-y-1/2 hover:translate-y-0"
+                className="absolute right-2 bottom-2"
                 onClick={handleSearch}
               >
                 Buscar
@@ -137,16 +132,16 @@ export default function ServicesPage() {
       <div className="container-meti py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar - Filters */}
-          <div className="lg:w-64 flex-shrink-0">
+          <div className="lg:w-64 shrink-0">
             <Card className="sticky top-24">
               <CardContent className="p-4">
-                <h3 className="font-heading font-semibold text-[var(--text-primary)] mb-4">
+                <h3 className="font-heading font-semibold text-text-primary mb-4">
                   Filtros
                 </h3>
 
                 {/* Categories */}
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-[var(--text-muted)] mb-2">
+                  <p className="text-sm font-medium text-text-muted mb-2">
                     Categorías
                   </p>
                   {categories.map((cat) => (
@@ -156,8 +151,8 @@ export default function ServicesPage() {
                       className={cn(
                         "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                         selectedCategory === cat.slug
-                          ? "bg-[var(--primary-light)] text-[var(--primary)] font-medium"
-                          : "text-[var(--text-secondary)] hover:bg-[var(--background)]"
+                          ? "bg-primary-light text-primary font-medium"
+                          : "text-text-secondary hover:bg-background"
                       )}
                     >
                       {cat.name}
@@ -167,7 +162,7 @@ export default function ServicesPage() {
 
                 {/* Sort */}
                 <div className="mt-6 space-y-2">
-                  <p className="text-sm font-medium text-[var(--text-muted)] mb-2">
+                  <p className="text-sm font-medium text-text-muted mb-2">
                     Ordenar por
                   </p>
                   <Select
@@ -187,7 +182,7 @@ export default function ServicesPage() {
           {/* Results */}
           <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-heading font-semibold text-[var(--text-primary)]">
+              <h2 className="text-lg font-heading font-semibold text-text-primary">
                 {sortedAdvisors.length} asesores encontrados
               </h2>
             </div>
@@ -217,22 +212,22 @@ export default function ServicesPage() {
                               className="w-14 h-14 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="w-14 h-14 rounded-full bg-[var(--primary-light)] flex items-center justify-center flex-shrink-0">
-                              <span className="text-xl font-bold text-[var(--primary)]">
+                            <div className="w-14 h-14 rounded-full bg-primary-light flex items-center justify-center shrink-0">
+                              <span className="text-xl font-bold text-primary">
                                 {advisor.name?.charAt(0) || "?"}
                               </span>
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-heading font-semibold text-[var(--text-primary)] truncate group-hover:text-[var(--primary)] transition-colors">
+                              <h3 className="font-heading font-semibold text-text-primary truncate group-hover:text-primary transition-colors">
                                 {advisor.name}
                               </h3>
                               {advisor.isVerified && (
                                 <VerifiedBadge isVerified={true} size="sm" />
                               )}
                             </div>
-                            <p className="text-sm text-[var(--text-muted)] truncate">
+                            <p className="text-sm text-text-muted truncate">
                               {advisor.speciality || "Profesional"}
                             </p>
                           </div>
@@ -240,7 +235,7 @@ export default function ServicesPage() {
 
                         {/* Bio preview */}
                         {advisor.bio && (
-                          <p className="text-sm text-[var(--text-secondary)] mb-3 line-clamp-2">
+                          <p className="text-sm text-text-secondary mb-3 line-clamp-2">
                             {advisor.bio}
                           </p>
                         )}
@@ -262,7 +257,7 @@ export default function ServicesPage() {
                         )}
 
                         {/* Footer */}
-                        <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
+                        <div className="flex items-center justify-between pt-3 border-t border-border">
                           <RatingStars
                             rating={advisor.rating}
                             size="sm"
@@ -270,7 +265,7 @@ export default function ServicesPage() {
                             reviewCount={advisor.reviewCount}
                           />
                           {advisor.minPriceWithFee > 0 && (
-                            <span className="text-sm font-heading font-bold text-[var(--primary)]">
+                            <span className="text-sm font-heading font-bold text-primary">
                               Desde {formatPrice(advisor.minPriceWithFee)}
                             </span>
                           )}
