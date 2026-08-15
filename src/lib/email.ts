@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { getAppUrl } from "@/lib/mercadopago";
 
-const FROM_EMAIL = process.env.EMAIL_FROM || "Meti <notificaciones@meti.cognilab.dev>";
+const FROM_EMAIL = process.env.EMAIL_FROM || "Meti <notificaciones@cognilab.dev>";
 
 // Cliente Resend lazy: solo se inicializa si hay API key configurada
 let resendClient: Resend | null = null;
