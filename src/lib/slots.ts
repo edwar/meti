@@ -16,6 +16,12 @@ export interface Service {
   name: string;
   durationMin: number;
   priceCents: number;
+  promotion?: {
+    id: string;
+    name: string;
+    discountType: "percentage" | "fixed";
+    discountValue: number;
+  } | null;
 }
 
 export interface BlockedTime {

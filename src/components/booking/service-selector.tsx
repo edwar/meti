@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, DollarSign, ArrowRight } from "lucide-react";
+import { Clock, DollarSign, ArrowRight, Tag, Percent } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency, formatDuration, type Service } from "@/lib/slots";
 
@@ -32,7 +32,14 @@ export function ServiceSelector({
       <div className="space-y-3">
         {services.map((service) => {
           const isSelected = selectedService?.id === service.id;
-          const priceWithFee = Math.round(service.priceCents * 1.15);
+          const promo = service.promotion;
+          const discount = promo
+            ? promo.discountType === "percentage"
+              ? Math.round(service.priceCents * promo.discountValue / 100)
+              : Math.min(promo.discountValue, service.priceCents)
+            : 0;
+          const priceAfterDiscount = Math.max(service.priceCents - discount, 0);
+          const priceWithFee = Math.round(priceAfterDiscount * 1.15);
 
           return (
             <Card
@@ -48,13 +55,25 @@ export function ServiceSelector({
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <h3 className="font-heading font-semibold text-[var(--text-primary)]">
                         {service.name}
                       </h3>
                       {isSelected && (
                         <Badge variant="default" className="text-xs">
                           Seleccionado
+                        </Badge>
+                      )}
+                      {promo && (
+                        <Badge variant="success" className="text-xs flex items-center gap-1">
+                          <Tag className="w-3 h-3" />
+                          {promo.name}
+                          {promo.discountType === "percentage" && (
+                            <span> -{promo.discountValue}%</span>
+                          )}
+                          {promo.discountType === "fixed" && (
+                            <span> -{formatCurrency(promo.discountValue)}</span>
+                          )}
                         </Badge>
                       )}
                     </div>
@@ -64,8 +83,18 @@ export function ServiceSelector({
                         {formatDuration(service.durationMin)}
                       </span>
                       <span className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4" />
-                        {formatCurrency(priceWithFee)}
+                        {discount > 0 ? (
+                          <>
+                            <DollarSign className="w-4 h-4" />
+                            <span className="line-through">{formatCurrency(service.priceCents)}</span>
+                            <span className="text-[var(--accent)] font-semibold">{formatCurrency(priceWithFee)}</span>
+                          </>
+                        ) : (
+                          <>
+                            <DollarSign className="w-4 h-4" />
+                            {formatCurrency(priceWithFee)}
+                          </>
+                        )}
                       </span>
                     </div>
                   </div>

@@ -21,6 +21,16 @@ export async function GET(
         services: {
           where: { isActive: true },
           orderBy: { priceCents: "asc" },
+          include: {
+            promotions: {
+              where: {
+                isActive: true,
+                startAt: { lte: new Date() },
+                endAt: { gte: new Date() },
+              },
+              select: { id: true, name: true, discountType: true, discountValue: true },
+            },
+          },
         },
         schedule: {
           where: { isActive: true },
@@ -65,6 +75,7 @@ export async function GET(
           durationMin: s.durationMin,
           priceCents: s.priceCents,
           rescheduleHoursMin: s.rescheduleHoursMin,
+          promotion: s.promotions?.[0] || null,
         })),
         schedule: advisor.schedule.map((s: any) => ({
           dayOfWeek: s.dayOfWeek,
