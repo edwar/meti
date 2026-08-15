@@ -67,6 +67,13 @@ export async function POST(request: NextRequest) {
     const platformFee = Math.round(advisorEarning * (feePercentage / 100));
     const totalCents = advisorEarning + platformFee;
 
+    // Parse ISO string to extract date/time components and create Date in SERVER timezone.
+    // This prevents timezone mismatches between the client and server.
+    const dateMatch = scheduledAt.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+    const scheduledDate = dateMatch
+      ? new Date(Number(dateMatch[1]), Number(dateMatch[2]) - 1, Number(dateMatch[3]), Number(dateMatch[4]), Number(dateMatch[5]))
+      : new Date(scheduledAt);
+
     // Create appointment as PENDING: blocks the slot immediately and is
     // confirmed by the Mercado Pago webhook once payment is approved.
     const appointment = await prisma.appointment.create({
@@ -74,7 +81,7 @@ export async function POST(request: NextRequest) {
         clientId: session.user.id,
         advisorId: advisorProfile.id,
         serviceId: serviceId,
-        scheduledAt: new Date(scheduledAt),
+        scheduledAt: scheduledDate,
         durationMin: service.durationMin,
         status: "PENDING",
         totalCents,
