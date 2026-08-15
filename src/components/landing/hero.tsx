@@ -33,17 +33,9 @@ export function Hero() {
 
       <div className="container-meti relative py-20 md:py-32 lg:py-40">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Logo */}
-          <div className="mb-8 animate-fade-in">
-            <img src="/logo.svg" alt="Meti - Plataforma de asesorías profesionales" className="w-20 h-20 mx-auto" />
-          </div>
-
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm mb-8 animate-fade-in-down border border-white/10">
-            <Sparkles className="w-4 h-4 text-[var(--accent)]" />
-            <span className="text-sm font-medium text-white/90">
-              Plataforma de asesorías profesionales
-            </span>
+          {/* Logo + Brand — visible for crawlers */}
+          <div className="mb-6">
+            <img src="/logo-wordmark.svg" alt="Meti" className="h-14 w-auto mx-auto" />
           </div>
 
           {/* Headline */}
@@ -54,10 +46,10 @@ export function Hero() {
             </span>
           </h1>
 
-          {/* Subhead */}
+          {/* Subhead — clear purpose for crawlers */}
           <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10 animate-fade-in-up stagger-1">
-            Conecta con profesionales expertos por videollamada. Legal, finanzas,
-            salud, tecnología y más. Agenda al instante, paga de forma segura.
+            Meti conecta personas con asesores profesionales por videollamada.
+            Legal, finanzas, salud, tecnología y más. Agenda al instante, paga de forma segura con Mercado Pago.
           </p>
 
           {/* Search Bar */}
