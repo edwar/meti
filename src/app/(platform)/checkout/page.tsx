@@ -312,11 +312,17 @@ function CheckoutContent() {
                   <div className="border-t border-[var(--border)] pt-4 space-y-3">
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="w-4 h-4 text-[var(--text-muted)]" />
-                      <span className="text-[var(--text-primary)]">{date}</span>
+                      <span className="text-[var(--text-primary)] capitalize">
+                        {(() => {
+                          const [y, m, d] = date.split("-");
+                          const dt = new Date(Number(y), Number(m) - 1, Number(d));
+                          return dt.toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+                        })()}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="w-4 h-4 text-[var(--text-muted)]" />
-                      <span className="text-[var(--text-primary)]">{time} • {duration} min</span>
+                      <span className="text-[var(--text-primary)]">{time} · {duration} min</span>
                     </div>
                   </div>
 
