@@ -1,0 +1,92 @@
+"use client";
+
+import { useState, useEffect, use } from "react";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { VideoCall } from "@/components/video/video-call";
+import { WaitingRoom } from "@/components/video/waiting-room";
+import { LoadingPage } from "@/components/ui/loading";
+
+export default function CallPage({
+  params,
+}: {
+  params: Promise<{ appointmentId: string }>;
+}) {
+  const { appointmentId } = use(params);
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [inCall, setInCall] = useState(false);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data } = await authClient.getSession();
+        if (!data) {
+          router.push("/login");
+          return;
+        }
+        setUser(data.user);
+      } catch (error) {
+        router.push("/login");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
+  }, [router]);
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  const userRole = (user as any).role === "ADVISOR" ? "advisor" : "client";
+
+  return (
+    <div className="min-h-screen bg-[var(--background)]">
+      <header className="border-b border-[var(--border)] bg-[var(--surface)]">
+        <div className="container-meti flex items-center justify-between h-16">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[var(--primary)]">
+              <span className="text-white font-heading font-bold text-lg">M</span>
+            </div>
+            <span className="font-heading font-bold text-xl text-[var(--secondary)]">
+              Meti
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            {user.image && (
+              <img
+                src={user.image}
+                alt={user.name}
+                className="w-8 h-8 rounded-full"
+              />
+            )}
+            <span className="text-sm font-medium">{user.name}</span>
+          </div>
+        </div>
+      </header>
+
+      <main className="container-meti py-8">
+        {inCall ? (
+          <VideoCall
+            appointmentId={appointmentId}
+            userRole={userRole as "advisor" | "client"}
+            userName={user.name}
+          />
+        ) : (
+          <WaitingRoom
+            appointmentId={appointmentId}
+            userRole={userRole as "advisor" | "client"}
+            onJoin={() => setInCall(true)}
+          />
+        )}
+      </main>
+    </div>
+  );
+}
