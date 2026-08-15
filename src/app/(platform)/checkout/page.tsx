@@ -338,10 +338,6 @@ function CheckoutContent() {
                         <span className="text-[var(--accent)] font-medium">-{formatCurrency(discountCents)}</span>
                       </div>
                     )}
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[var(--text-muted)]">Fee de plataforma (15%)</span>
-                      <span className="text-[var(--text-primary)]">{formatCurrency(serviceFee)}</span>
-                    </div>
                     <div className="border-t border-[var(--border)] pt-3 flex justify-between font-heading font-bold text-lg">
                       <span className="text-[var(--text-primary)]">Total</span>
                       <span className="text-[var(--primary)]">{formatCurrency(serviceTotal)}</span>
