@@ -32,12 +32,7 @@ export default function RegisterPage() {
       {/* Logo */}
       <div className="text-center">
         <Link href="/" className="inline-flex items-center gap-2">
-          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--primary)]">
-            <span className="text-white font-heading font-bold text-2xl">M</span>
-          </div>
-          <span className="font-heading font-bold text-3xl text-[var(--secondary)]">
-            Meti
-          </span>
+          <img src="/logo-wordmark.svg" alt="Meti" className="h-10 w-auto" />
         </Link>
       </div>
 

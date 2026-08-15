@@ -61,6 +61,22 @@ export default function RootLayout({
       lang="es"
       className={`${inter.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: "Meti",
+              description: "Plataforma de asesorías profesionales online. Conecta con asesores expertos por videollamada.",
+              url: "https://meti.cognilab.dev",
+              applicationCategory: "BusinessApplication",
+              operatingSystem: "Web",
+            }),
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         <QueryProvider>
           <AuthProvider>{children}</AuthProvider>

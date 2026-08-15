@@ -46,9 +46,7 @@ function LoginContent() {
     <div className="space-y-6">
       <div className="text-center">
         <Link href="/" className="inline-flex items-center gap-2">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl overflow-hidden">
-                <img src="/logo.svg" alt="Meti" className="w-full h-full object-contain" />
-              </div>
+              <img src="/logo-wordmark.svg" alt="Meti" className="h-10 w-auto mx-auto" />
           <span className="font-heading font-bold text-3xl text-[var(--secondary)]">
             Meti
           </span>

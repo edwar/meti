@@ -33,6 +33,11 @@ export function Hero() {
 
       <div className="container-meti relative py-20 md:py-32 lg:py-40">
         <div className="max-w-4xl mx-auto text-center">
+          {/* Logo */}
+          <div className="mb-8 animate-fade-in">
+            <img src="/logo.svg" alt="Meti - Plataforma de asesorías profesionales" className="w-20 h-20 mx-auto" />
+          </div>
+
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm mb-8 animate-fade-in-down border border-white/10">
             <Sparkles className="w-4 h-4 text-[var(--accent)]" />
