@@ -77,6 +77,10 @@ function isSlotBlocked(
   });
 }
 
+// Timezone offset de la app (Colombia, UTC-5 = -5 horas desde UTC)
+// Usado para convertir appointment times (UTC) a hora local para comparar con slots
+const APP_TIMEZONE_OFFSET_HOURS = -5;
+
 export function generateAvailableSlots(
   schedule: Schedule,
   serviceDuration: number,
@@ -107,13 +111,15 @@ export function generateAvailableSlots(
     }
 
     const slotTime = minutesToTime(current);
-    const slotEnd = minutesToTime(current + serviceDuration);
 
     // Check if slot conflicts with existing appointments
+    // Convert appointment UTC time to local time using the app timezone offset
     const hasAppointmentConflict = existingAppointments.some((apt) => {
-      const aptStart = apt.start.getHours() * 60 + apt.start.getMinutes();
-      const aptEnd = apt.end.getHours() * 60 + apt.end.getMinutes();
-      return current < aptEnd && current + serviceDuration > aptStart;
+      const aptStartUTC = apt.start.getUTCHours() * 60 + apt.start.getUTCMinutes();
+      const aptEndUTC = apt.end.getUTCHours() * 60 + apt.end.getUTCMinutes();
+      const aptStartLocal = ((aptStartUTC + APP_TIMEZONE_OFFSET_HOURS * 60) % (24 * 60) + 24 * 60) % (24 * 60);
+      const aptEndLocal = ((aptEndUTC + APP_TIMEZONE_OFFSET_HOURS * 60) % (24 * 60) + 24 * 60) % (24 * 60);
+      return current < aptEndLocal && current + serviceDuration > aptStartLocal;
     });
 
     // Check if slot conflicts with blocked times
