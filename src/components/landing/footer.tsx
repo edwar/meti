@@ -30,8 +30,8 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[var(--primary)]">
-                <span className="text-white font-heading font-bold text-lg">M</span>
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg overflow-hidden">
+                <img src="/logo.svg" alt="Meti" className="w-full h-full object-contain" />
               </div>
               <span className="font-heading font-bold text-xl">Meti</span>
             </Link>
@@ -41,7 +41,7 @@ export function Footer() {
             <div className="space-y-2 text-sm text-white/60">
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                <span>hola@meti.cognilab.dev</span>
+                <span>edwaramayadiaz@gmail.com</span>
               </div>
             </div>
           </div>

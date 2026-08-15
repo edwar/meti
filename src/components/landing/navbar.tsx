@@ -34,8 +34,8 @@ export function Navbar() {
       <div className="container-meti flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[var(--primary)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-            <span className="text-white font-heading font-bold text-lg">M</span>
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg overflow-hidden transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+            <img src="/logo.svg" alt="Meti" className="w-full h-full object-contain" />
           </div>
           <span className="font-heading font-bold text-xl text-[var(--secondary)]">
             Meti
