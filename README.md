@@ -285,7 +285,7 @@ Estado actual: **MVP en desarrollo**.
 - [x] Panel admin (verificación, fees, usuarios)
 - [x] Notificaciones (Sileo): recordatorios y alertas de booking
 - [x] Promociones por fechas especiales
-- [ ] Facturación mensual automática para asesores
+- [x] Facturación mensual automática para asesores
 - [ ] Modo oscuro
 - [ ] Grabación y chat persistente en videollamadas
 
