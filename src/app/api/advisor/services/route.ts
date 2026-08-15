@@ -37,7 +37,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ services });
+    return NextResponse.json({ services, isActive: advisorProfile.isActive });
   } catch (error) {
     console.error("Error fetching services:", error);
     return NextResponse.json(
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     if (!advisorProfile.isActive) {
       return NextResponse.json(
-        { error: "Tu cuenta de asesor está pendiente de aprobación" },
+        { error: "No puedes crear servicios hasta ser aprobado por un administrador del sistema." },
         { status: 403 }
       );
     }

@@ -15,7 +15,7 @@ import {
   useUpdateService,
   useDeleteService,
 } from "@/lib/hooks";
-import { Plus, Briefcase, Clock, DollarSign, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Briefcase, Clock, DollarSign, Edit, Trash2, Eye, EyeOff, AlertTriangle } from "lucide-react";
 
 function formatCurrency(cents: number) {
   return new Intl.NumberFormat("es-CO", {
@@ -44,6 +44,7 @@ export default function ServicesPage() {
   const deleteService = useDeleteService();
 
   const services = data?.services || [];
+  const isActive = data?.isActive ?? true;
 
   const handleDelete = async (id: string, name: string) => {
     const confirmed = await dialog.showConfirm(
@@ -85,11 +86,25 @@ export default function ServicesPage() {
             Gestiona los servicios que ofreces a tus clientes
           </p>
         </div>
-        <Button onClick={() => setShowModal(true)}>
+        <Button onClick={() => setShowModal(true)} disabled={!isActive}>
           <Plus className="w-4 h-4 mr-2" />
           Nuevo servicio
         </Button>
       </div>
+
+      {/* Advisor inactive warning */}
+      {!isActive && (
+        <Card className="border-[var(--warning)] bg-[var(--warning-light)]">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-5 h-5 text-[var(--warning)] flex-shrink-0" />
+              <p className="text-sm text-[var(--text-primary)]">
+                <strong>Su cuenta de asesor está pendiente de aprobación.</strong> No podrás crear servicios ni recibir clientes hasta que un administrador verifique tu perfil y documentos.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Services List */}
       {services.length === 0 ? (
@@ -97,12 +112,15 @@ export default function ServicesPage() {
           <CardContent className="p-12">
             <EmptyState
               icon={Briefcase}
-              title="No tienes servicios creados"
-              description="Crea tu primer servicio para que los clientes puedan agendar asesorías contigo."
-              action={{
+              title={isActive ? "No tienes servicios creados" : "Servicios no disponibles"}
+              description={isActive
+                ? "Crea tu primer servicio para que los clientes puedan agendar asesorías contigo."
+                : "Necesitas ser aprobado por un administrador antes de crear servicios."
+              }
+              action={isActive ? {
                 label: "Crear primer servicio",
                 onClick: () => setShowModal(true),
-              }}
+              } : undefined}
             />
           </CardContent>
         </Card>
