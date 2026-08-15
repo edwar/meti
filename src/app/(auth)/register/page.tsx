@@ -43,6 +43,8 @@ export default function RegisterPage() {
       if (signUpError) {
         setError(signUpError.message || "Error al crear la cuenta. Intenta de nuevo.");
         setIsLoading(false);
+      } else {
+        router.push("/redirect");
       }
     } catch (err) {
       setError("Error al crear la cuenta. Intenta de nuevo.");

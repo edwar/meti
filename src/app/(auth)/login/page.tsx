@@ -49,6 +49,8 @@ function LoginContent() {
       if (signInError) {
         setError(signInError.message || "Email o contraseña incorrectos.");
         setIsLoading(false);
+      } else {
+        router.push("/redirect");
       }
     } catch (err) {
       setError("Error al iniciar sesión. Intenta de nuevo.");
