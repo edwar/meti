@@ -39,7 +39,9 @@ export function ServiceSelector({
             : 0;
           const priceAfterDiscount = Math.max(service.priceCents - discount, 0);
           // Fee siempre sobre el precio original (el descuento lo absorbe el asesor)
-          const priceWithFee = Math.round(service.priceCents * 1.15);
+          const fee = Math.round(service.priceCents * 0.15);
+          const totalOriginal = service.priceCents + fee;
+          const totalWithDiscount = priceAfterDiscount + fee;
 
           return (
             <Card
@@ -85,11 +87,11 @@ export function ServiceSelector({
                       <span className="flex items-center gap-1">
                         {discount > 0 ? (
                           <>
-                            <span className="line-through">{formatCurrency(service.priceCents)}</span>
-                            <span className="text-[var(--accent)] font-semibold">{formatCurrency(priceWithFee)}</span>
+                            <span className="line-through">{formatCurrency(totalOriginal)}</span>
+                            <span className="text-[var(--accent)] font-semibold">{formatCurrency(totalWithDiscount)}</span>
                           </>
                         ) : (
-                          <>{formatCurrency(priceWithFee)}</>
+                          <>{formatCurrency(totalOriginal)}</>
                         )}
                       </span>
                     </div>
