@@ -330,9 +330,9 @@ function CheckoutContent() {
                     <div className="flex justify-between text-sm">
                       <span className="text-[var(--text-muted)]">{serviceName}</span>
                       {discountCents > 0 ? (
-                        <span className="text-[var(--text-muted)] line-through">{formatCurrency(servicePrice)}</span>
+                        <span className="text-[var(--text-muted)] line-through">{formatCurrency(serviceTotal)}</span>
                       ) : (
-                        <span className="text-[var(--text-primary)]">{formatCurrency(servicePrice)}</span>
+                        <span className="text-[var(--text-primary)]">{formatCurrency(serviceTotal)}</span>
                       )}
                     </div>
                     {discountCents > 0 && (
