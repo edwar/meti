@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { use } from "react";
 import { useRouter } from "next/navigation";
+import "lite-youtube-embed";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -250,12 +251,11 @@ export default function AdvisorProfilePage({ params }: { params: Promise<{ id: s
                       <p className="text-xs font-medium text-[var(--text-muted)] mb-2">
                         Video de presentación
                       </p>
-                      <div className="aspect-video rounded-lg overflow-hidden bg-[var(--background)]">
-                        <video
-                          src={advisor.videoUrl}
-                          controls
-                          className="w-full h-full object-cover"
-                          poster={advisor.image || undefined}
+                      <div className="rounded-lg overflow-hidden">
+                        <lite-youtube
+                          videoid={advisor.videoUrl.replace(/.*(?:v=|\/)([\w-]{11}).*/, "$1")}
+                          playlabel="Reproducir video de presentación"
+                          className="w-full"
                         />
                       </div>
                     </div>
