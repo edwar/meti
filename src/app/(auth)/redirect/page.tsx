@@ -45,8 +45,21 @@ export default function RedirectPage() {
           return;
         }
 
-        // No pending booking, redirect based on role
+        // Si no hay ningún admin, el primer usuario debe pasar por onboarding
+        // para poder elegir ser admin (el default CLIENT lo saltaría directo al dashboard)
         const user = data.user as any;
+        if (user.role === "CLIENT") {
+          try {
+            const res = await fetch("/api/admin/setup");
+            const { hasAdmins } = await res.json();
+            if (!hasAdmins) {
+              router.push("/onboarding");
+              return;
+            }
+          } catch {}
+        }
+
+        // Redirect based on role
         if (user.role) {
           switch (user.role) {
             case "ADMIN":
