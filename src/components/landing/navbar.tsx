@@ -2,25 +2,45 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/auth-client";
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    authClient.getSession().then(({ data }) => {
+      if (data) setUser(data.user);
+    });
+  }, []);
+
   const isServicesActive = pathname === "/services" || pathname.startsWith("/advisor/");
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    setUser(null);
+    router.push("/");
+  };
+
+  const getDashboardHref = () => {
+    const role = user?.role;
+    if (role === "ADMIN") return "/admin";
+    if (role === "ADVISOR") return "/advisor";
+    return "/dashboard";
+  };
 
   return (
     <header
@@ -32,7 +52,6 @@ export function Navbar() {
       )}
     >
       <div className="container-meti flex h-16 items-center justify-between">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <img src="/logo-wordmark.svg" alt="Meti" className="h-9 w-auto" />
         </Link>
@@ -54,12 +73,26 @@ export function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="secondary" size="sm" asChild>
-            <Link href="/login">Iniciar sesión</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link href="/register">Registrarse</Link>
-          </Button>
+          {user ? (
+            <>
+              <Button variant="secondary" size="sm" asChild>
+                <Link href={getDashboardHref()}>Mi panel</Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4 mr-1" />
+                Salir
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="secondary" size="sm" asChild>
+                <Link href="/login">Iniciar sesión</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/register">Registrarse</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -97,12 +130,26 @@ export function Navbar() {
             Explorar asesores
           </Link>
           <div className="pt-3 border-t border-[var(--border)] space-y-2">
-            <Button variant="secondary" className="w-full" asChild>
-              <Link href="/login">Iniciar sesión</Link>
-            </Button>
-            <Button className="w-full" asChild>
-              <Link href="/register">Registrarse</Link>
-            </Button>
+            {user ? (
+              <>
+                <Button variant="secondary" className="w-full" asChild>
+                  <Link href={getDashboardHref()} onClick={() => setMobileMenuOpen(false)}>Mi panel</Link>
+                </Button>
+                <Button variant="ghost" className="w-full" onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}>
+                  <LogOut className="w-4 h-4 mr-1" />
+                  Cerrar sesión
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="secondary" className="w-full" asChild>
+                  <Link href="/login">Iniciar sesión</Link>
+                </Button>
+                <Button className="w-full" asChild>
+                  <Link href="/register">Registrarse</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
