@@ -53,6 +53,7 @@ export async function GET(
         image: advisor.user.image,
         speciality: advisor.speciality,
         bio: advisor.bio,
+        videoUrl: advisor.videoUrl,
         isVerified: advisor.isVerified,
         rating: Math.round(avgRating * 10) / 10,
         reviewCount: reviews.length,

@@ -34,6 +34,7 @@ interface Advisor {
   image: string | null;
   speciality: string | null;
   bio: string | null;
+  videoUrl: string | null;
   isVerified: boolean;
   rating: number;
   reviewCount: number;
@@ -241,6 +242,23 @@ export default function AdvisorProfilePage({ params }: { params: Promise<{ id: s
                     <p className="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">
                       {advisor.bio}
                     </p>
+                  )}
+
+                  {/* Video de presentación */}
+                  {advisor.videoUrl && (
+                    <div className="mt-4">
+                      <p className="text-xs font-medium text-[var(--text-muted)] mb-2">
+                        Video de presentación
+                      </p>
+                      <div className="aspect-video rounded-lg overflow-hidden bg-[var(--background)]">
+                        <video
+                          src={advisor.videoUrl}
+                          controls
+                          className="w-full h-full object-cover"
+                          poster={advisor.image || undefined}
+                        />
+                      </div>
+                    </div>
                   )}
 
                   {/* Categories */}
