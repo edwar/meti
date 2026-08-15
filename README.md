@@ -284,7 +284,7 @@ Estado actual: **MVP en desarrollo**.
 - [x] Webhooks de Mercado Pago (confirmación de pago real)
 - [x] Panel admin (verificación, fees, usuarios)
 - [x] Notificaciones (Sileo): recordatorios y alertas de booking
-- [ ] Promociones por fechas especiales
+- [x] Promociones por fechas especiales
 - [ ] Facturación mensual automática para asesores
 - [ ] Modo oscuro
 - [ ] Grabación y chat persistente en videollamadas
