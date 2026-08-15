@@ -123,7 +123,7 @@ export default function ServicesPage() {
                 className="w-full h-14 pl-12 pr-4 bg-white rounded-xl text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
               />
               <Button
-                className="absolute right-2 top-1/2 -translate-y-1/2"
+                className="absolute right-2 top-1/2 -translate-y-1/2 hover:translate-y-0"
                 onClick={handleSearch}
               >
                 Buscar
