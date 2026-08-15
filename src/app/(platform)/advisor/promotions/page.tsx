@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingPage } from "@/components/ui/loading";
 import { Select } from "@/components/ui/select";
+import { AlertDialog } from "@/components/ui/alert-dialog";
+import { useDialog } from "@/hooks/use-dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { sileo } from "sileo";
 import { Plus, Tag, Trash2, Percent, DollarSign, Clock } from "lucide-react";
@@ -21,6 +23,7 @@ function formatCurrency(cents: number) {
 export default function PromotionsPage() {
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
+  const dialog = useDialog();
 
   const { data, isLoading } = useQuery({
     queryKey: ["advisor-promotions"],
@@ -113,7 +116,10 @@ export default function PromotionsPage() {
                       <Button variant="ghost" size="sm" onClick={() => toggleActive.mutate({ id: promo.id, isActive: promo.isActive })} disabled={isExpired}>
                         {promo.isActive ? "Desactivar" : "Activar"}
                       </Button>
-                      <Button variant="ghost" size="icon" className="text-[var(--error)]" onClick={() => { if (confirm("¿Eliminar esta promoción?")) deleteMutation.mutate(promo.id); }}>
+                      <Button variant="ghost" size="icon" className="text-[var(--error)]" onClick={async () => {
+                        const ok = await dialog.showConfirm("Eliminar promoción", `¿Estás seguro de eliminar "${promo.name}"? Esta acción no se puede deshacer.`, "warning");
+                        if (ok) deleteMutation.mutate(promo.id);
+                      }}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
@@ -134,6 +140,7 @@ export default function PromotionsPage() {
           services={services}
         />
       )}
+      <AlertDialog state={dialog} />
     </div>
   );
 }
