@@ -89,15 +89,21 @@ export function BookingSummary({
           {/* Price */}
           <div className="border-t border-[var(--border)] pt-4 space-y-2">
             {discountCents > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="flex items-center gap-1 text-[var(--accent)]">
-                  <Tag className="w-4 h-4" />
-                  {promo!.name}
-                </span>
-                <span className="text-[var(--accent)] font-medium">
-                  -{formatCurrency(discountCents)}
-                </span>
-              </div>
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[var(--text-muted)]">Valor original</span>
+                  <span className="text-[var(--text-muted)] line-through">{formatCurrency(totalOriginal)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="flex items-center gap-1 text-[var(--accent)]">
+                    <Tag className="w-4 h-4" />
+                    {promo!.name}
+                  </span>
+                  <span className="text-[var(--accent)] font-medium">
+                    -{formatCurrency(discountCents)}
+                  </span>
+                </div>
+              </>
             )}
             <div className="flex justify-between font-heading font-bold text-lg">
               <span className="text-[var(--text-primary)]">Total</span>
