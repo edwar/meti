@@ -132,6 +132,7 @@ model AdvisorProfile {
   promotions      Promotion[]
   appointments    Appointment[]
   documents       AdvisorDocument[]
+  invoices        Invoice[]
   categories      AdvisorCategory[]
   blockedTimes    BlockedTime[]
 
@@ -296,6 +297,34 @@ model Promotion {
   service       AdvisorService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   @@map("promotions")
+}
+
+// ============================================
+// INVOICING (facturación mensual de fees)
+// ============================================
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+}
+
+model Invoice {
+  id                 String        @id @default(cuid())
+  advisorId          String
+  periodStart        DateTime      // Inicio del período (primer día del mes)
+  periodEnd          DateTime      // Fin del período (último día del mes)
+  totalFeeCents      Int           // Suma de platformFee de las citas del mes
+  totalEarningsCents Int           // Suma de advisorEarning de las citas del mes
+  appointmentCount   Int
+  status             InvoiceStatus @default(PENDING)
+  paidAt             DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  advisor            AdvisorProfile @relation(fields: [advisorId], references: [id], onDelete: Cascade)
+
+  @@unique([advisorId, periodStart, periodEnd])
+  @@map("invoices")
 }
 
 // ============================================
