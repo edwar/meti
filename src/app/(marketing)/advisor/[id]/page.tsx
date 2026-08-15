@@ -18,7 +18,7 @@ import { LoadingPage } from "@/components/ui/loading";
 import { savePendingBooking } from "@/lib/booking-utils";
 import { useCheckoutStore } from "@/lib/checkout-store";
 import { authClient } from "@/lib/auth-client";
-import { getAvailableDates, formatCurrency, formatDuration } from "@/lib/slots";
+import { getAvailableDates, formatCurrency, formatDuration, type TimeSlot } from "@/lib/slots";
 import {
   ArrowLeft,
   Video,
@@ -92,10 +92,56 @@ export default function AdvisorProfilePage({ params }: { params: Promise<{ id: s
     return getAvailableDates(advisor.schedule, selectedService.durationMin);
   }, [selectedService, advisor?.schedule]);
 
+  // Disponibilidad REAL: consulta las citas existentes vía API por cada fecha.
+  // getAvailableDates solo genera slots del horario; el API marca los ya reservados.
+  const [apiSlots, setApiSlots] = useState<Record<string, { slots: TimeSlot[]; hasAvailability: boolean }>>({});
+
+  useEffect(() => {
+    if (!selectedService || !advisor || availableDates.length === 0) {
+      setApiSlots({});
+      return;
+    }
+    let cancelled = false;
+    const fetchRealSlots = async () => {
+      const results: Record<string, { slots: TimeSlot[]; hasAvailability: boolean }> = {};
+      await Promise.all(
+        availableDates.map(async (day) => {
+          try {
+            const res = await fetch(
+              `/api/slots?advisorId=${advisor.id}&serviceId=${selectedService.id}&date=${day.dateStr}`
+            );
+            if (res.ok) {
+              const data = await res.json();
+              const slots = data.slots || [];
+              results[day.dateStr] = {
+                slots,
+                hasAvailability: slots.some((s: TimeSlot) => s.available),
+              };
+            }
+          } catch (e) {}
+        })
+      );
+      if (!cancelled) setApiSlots(results);
+    };
+    fetchRealSlots();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedService, advisor, availableDates]);
+
+  // Merge: usar la disponibilidad real del API cuando esté disponible
+  const mergedDates = useMemo(() => {
+    return availableDates.map((day) => {
+      const real = apiSlots[day.dateStr];
+      if (!real) return day;
+      return { ...day, slots: real.slots, hasAvailability: real.hasAvailability };
+    });
+  }, [availableDates, apiSlots]);
+
   const selectedDaySlots = useMemo(() => {
     if (!selectedDate || !selectedService) return null;
-    return availableDates.find((d) => d.dateStr === selectedDate.dateStr) || null;
-  }, [selectedDate, selectedService, availableDates]);
+    return mergedDates.find((d) => d.dateStr === selectedDate.dateStr) || null;
+  }, [selectedDate, selectedService, mergedDates]);
 
   const handleServiceSelect = (service: any) => {
     setSelectedService(service);

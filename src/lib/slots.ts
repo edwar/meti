@@ -1,5 +1,6 @@
 import { addDays, format, startOfDay, isSameDay, getDay, isWithinInterval } from "date-fns";
 import { es } from "date-fns/locale";
+import { utcMinutesToLocal } from "@/lib/timezone";
 
 export interface Schedule {
   dayOfWeek: number;
@@ -113,12 +114,11 @@ export function generateAvailableSlots(
     const slotTime = minutesToTime(current);
 
     // Check if slot conflicts with existing appointments
-    // Convert appointment UTC time to local time using the app timezone offset
+    // Los appointments se guardan en UTC; convertimos a hora local (Colombia)
+    // para comparar con los slots (que se generan en hora local).
     const hasAppointmentConflict = existingAppointments.some((apt) => {
-      const aptStartUTC = apt.start.getUTCHours() * 60 + apt.start.getUTCMinutes();
-      const aptEndUTC = apt.end.getUTCHours() * 60 + apt.end.getUTCMinutes();
-      const aptStartLocal = ((aptStartUTC + APP_TIMEZONE_OFFSET_HOURS * 60) % (24 * 60) + 24 * 60) % (24 * 60);
-      const aptEndLocal = ((aptEndUTC + APP_TIMEZONE_OFFSET_HOURS * 60) % (24 * 60) + 24 * 60) % (24 * 60);
+      const aptStartLocal = utcMinutesToLocal(apt.start.getUTCHours() * 60 + apt.start.getUTCMinutes());
+      const aptEndLocal = utcMinutesToLocal(apt.end.getUTCHours() * 60 + apt.end.getUTCMinutes());
       return current < aptEndLocal && current + serviceDuration > aptStartLocal;
     });
 

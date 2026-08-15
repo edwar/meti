@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateAvailableSlots } from "@/lib/slots";
+import { APP_TIMEZONE_OFFSET_HOURS } from "@/lib/timezone";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -45,11 +46,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get existing appointments for that date
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    // Get existing appointments for that date (en timezone de la app, Colombia UTC-5)
+    const [y, m, d] = date.split("-").map(Number);
+    const startOfDay = new Date(Date.UTC(y, m - 1, d, -APP_TIMEZONE_OFFSET_HOURS, 0, 0, 0));
+    const endOfDay = new Date(Date.UTC(y, m - 1, d, 23 - APP_TIMEZONE_OFFSET_HOURS, 59, 59, 999));
 
     const existingAppointments = await prisma.appointment.findMany({
       where: {

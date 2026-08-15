@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { createCheckoutPreference } from "@/lib/mercadopago";
+import { parseLocalISO } from "@/lib/timezone";
 
 const appointmentSchema = z.object({
   advisorId: z.string(),
@@ -67,12 +68,9 @@ export async function POST(request: NextRequest) {
     const platformFee = Math.round(advisorEarning * (feePercentage / 100));
     const totalCents = advisorEarning + platformFee;
 
-    // Parse ISO string to extract date/time components and create Date in SERVER timezone.
-    // This prevents timezone mismatches between the client and server.
-    const dateMatch = scheduledAt.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-    const scheduledDate = dateMatch
-      ? new Date(Number(dateMatch[1]), Number(dateMatch[2]) - 1, Number(dateMatch[3]), Number(dateMatch[4]), Number(dateMatch[5]))
-      : new Date(scheduledAt);
+    // Parsear fecha/hora local (Colombia) del ISO y construir el timestamp UTC
+    // explícitamente — independiente del timezone del servidor.
+    const parsedDate = parseLocalISO(scheduledAt);
 
     // Create appointment as PENDING: blocks the slot immediately and is
     // confirmed by the Mercado Pago webhook once payment is approved.
@@ -81,7 +79,7 @@ export async function POST(request: NextRequest) {
         clientId: session.user.id,
         advisorId: advisorProfile.id,
         serviceId: serviceId,
-        scheduledAt: scheduledDate,
+        scheduledAt: parsedDate || new Date(scheduledAt),
         durationMin: service.durationMin,
         status: "PENDING",
         totalCents,
