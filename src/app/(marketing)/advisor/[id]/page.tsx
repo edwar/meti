@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { use } from "react";
 import { useRouter } from "next/navigation";
-import "lite-youtube-embed";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -251,11 +250,13 @@ export default function AdvisorProfilePage({ params }: { params: Promise<{ id: s
                       <p className="text-xs font-medium text-[var(--text-muted)] mb-2">
                         Video de presentación
                       </p>
-                      <div className="rounded-lg overflow-hidden">
-                        <lite-youtube
-                          videoid={advisor.videoUrl.replace(/.*(?:v=|\/)([\w-]{11}).*/, "$1")}
-                          playlabel="Reproducir video de presentación"
-                          className="w-full"
+                      <div className="aspect-video rounded-lg overflow-hidden">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${advisor.videoUrl.replace(/.*(?:v=|\/|youtu\.be\/)([\w-]{11}).*/, "$1")}`}
+                          title="Video de presentación"
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
                         />
                       </div>
                     </div>
