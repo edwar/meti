@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPayment } from "@/lib/mercadopago";
+import { notifyAppointmentConfirmed } from "@/lib/notify";
 
 // POST: Verificar pago directamente con MP y confirmar la cita
 export async function POST(
@@ -36,10 +37,19 @@ export async function POST(
     const payment = await getPayment(appointment.advisor.mpAccessToken, paymentId);
 
     if (payment?.status === "approved") {
+      const wasPending = appointment.status === "PENDING";
       await prisma.appointment.update({
         where: { id: appointment.id },
         data: { status: "CONFIRMED", paymentId },
       });
+      // Enviar emails de confirmación solo si estaba pendiente (evita duplicados)
+      if (wasPending) {
+        try {
+          await notifyAppointmentConfirmed(appointment.id);
+        } catch (e) {
+          console.error("Error sending confirmation emails:", e);
+        }
+      }
       return NextResponse.json({ ok: true, confirmed: true });
     }
 

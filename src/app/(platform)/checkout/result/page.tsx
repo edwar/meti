@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { sileo } from "sileo";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingPage } from "@/components/ui/loading";
@@ -106,6 +107,17 @@ function ResultContent() {
       return () => clearTimeout(timer);
     }
   }, [appointment, pollAttempts, fetchAppointment]);
+
+  // Toast al confirmarse el pago
+  useEffect(() => {
+    if (appointment?.status === "CONFIRMED") {
+      sileo.success({
+        title: "¡Pago confirmado!",
+        description: "Tu asesoría quedó reservada. Revisa los detalles abajo.",
+        duration: 6000,
+      });
+    }
+  }, [appointment?.status]);
 
   if (isLoading) {
     return (

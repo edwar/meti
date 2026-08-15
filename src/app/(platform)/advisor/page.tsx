@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingPage } from "@/components/ui/loading";
 import Link from "next/link";
+import { sileo } from "sileo";
 import { useAdvisorDashboard } from "@/lib/hooks";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -27,6 +29,28 @@ function formatCurrency(cents: number) {
 
 export default function AdvisorDashboard() {
   const { data, isLoading, error } = useAdvisorDashboard();
+
+  // Alerta de nuevas reservas: muestra un toast por cada cita nueva
+  // desde la última vez que el asesor visitó su panel.
+  useEffect(() => {
+    if (!data?.recentAppointments?.length) return;
+    const lastSeenId = localStorage.getItem("meti-last-seen-appointment");
+    for (const apt of data.recentAppointments) {
+      if (apt.id !== lastSeenId) {
+        sileo.action({
+          title: "🔔 Nueva reserva",
+          description: `${apt.clientName} reservó ${apt.serviceName} para ${format(new Date(apt.scheduledAt), "EEE d 'de' MMM 'a las' HH:mm", { locale: es })}`,
+          duration: 8000,
+        });
+      }
+    }
+    if (data.recentAppointments.length > 0) {
+      localStorage.setItem(
+        "meti-last-seen-appointment",
+        data.recentAppointments[0].id
+      );
+    }
+  }, [data?.recentAppointments]);
 
   if (isLoading) return <LoadingPage />;
 

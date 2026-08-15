@@ -16,6 +16,7 @@ import {
   useDeleteService,
 } from "@/lib/hooks";
 import { Plus, Briefcase, Clock, DollarSign, Edit, Trash2, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { sileo } from "sileo";
 
 function formatCurrency(cents: number) {
   return new Intl.NumberFormat("es-CO", {
@@ -58,10 +59,10 @@ export default function ServicesPage() {
       setDeletingId(id);
       deleteService.mutate(id, {
         onSuccess: () => {
-          dialog.showAlert("Éxito", "Servicio eliminado correctamente", "success");
+          sileo.success({ title: "Servicio eliminado", description: `"${name}" fue eliminado correctamente.` });
         },
         onError: () => {
-          dialog.showAlert("Error", "Error al eliminar servicio", "error");
+          sileo.error({ title: "Error", description: "No se pudo eliminar el servicio. Intenta de nuevo." });
         },
         onSettled: () => {
           setDeletingId(null);
@@ -75,14 +76,15 @@ export default function ServicesPage() {
       { id: service.id, isActive: !service.isActive },
       {
         onSuccess: () => {
-          dialog.showAlert(
-            "Éxito",
-            `Servicio ${service.isActive ? "desactivado" : "activado"} correctamente`,
-            "success"
-          );
+          sileo.success({
+            title: service.isActive ? "Servicio desactivado" : "Servicio activado",
+            description: service.isActive
+              ? "Los clientes ya no podrán agendar este servicio."
+              : "Los clientes ya pueden agendar este servicio.",
+          });
         },
         onError: () => {
-          dialog.showAlert("Error", "Error al cambiar estado del servicio", "error");
+          sileo.error({ title: "Error", description: "No se pudo cambiar el estado del servicio." });
         },
       }
     );
@@ -239,23 +241,23 @@ export default function ServicesPage() {
             if (editingService) {
               updateService.mutate(data, {
                 onSuccess: () => {
-                  dialog.showAlert("Éxito", "Servicio actualizado correctamente", "success");
+                  sileo.success({ title: "Servicio actualizado", description: "Los cambios se guardaron correctamente." });
                   setShowModal(false);
                   setEditingService(null);
                 },
                 onError: (err: any) => {
-                  dialog.showAlert("Error", err.message || "Error al actualizar el servicio", "error");
+                  sileo.error({ title: "Error", description: err.message || "No se pudo actualizar el servicio." });
                 },
               });
             } else {
               createService.mutate(data, {
                 onSuccess: () => {
-                  dialog.showAlert("Éxito", "Servicio creado correctamente", "success");
+                  sileo.success({ title: "Servicio creado", description: "Tu nuevo servicio ya está disponible para los clientes." });
                   setShowModal(false);
                   setEditingService(null);
                 },
                 onError: (err: any) => {
-                  dialog.showAlert("Error", err.message || "Error al crear el servicio", "error");
+                  sileo.error({ title: "Error", description: err.message || "No se pudo crear el servicio." });
                 },
               });
             }

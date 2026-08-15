@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPayment } from "@/lib/mercadopago";
+import { notifyAppointmentConfirmed } from "@/lib/notify";
 
 interface PaymentNotification {
   type?: string;
@@ -120,6 +121,7 @@ export async function POST(request: NextRequest) {
     const paymentStatus = payment?.status;
 
     if (paymentStatus === "approved") {
+      const wasPending = appointment.status === "PENDING";
       await prisma.appointment.update({
         where: { id: appointment.id },
         data: {
@@ -127,6 +129,14 @@ export async function POST(request: NextRequest) {
           paymentId,
         },
       });
+      // Emails de confirmación (solo si venía de PENDING, evita duplicados)
+      if (wasPending) {
+        try {
+          await notifyAppointmentConfirmed(appointment.id);
+        } catch (e) {
+          console.error("Error sending confirmation emails:", e);
+        }
+      }
       return NextResponse.json({ ok: true, confirmed: true });
     }
 

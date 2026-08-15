@@ -342,6 +342,9 @@ model Appointment {
   cancelReason    String?
   cancelledAt     DateTime?
 
+  // Notifications
+  reminderSentAt  DateTime?          // Último recordatorio enviado (cron 24h)
+
   // Timestamps
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
