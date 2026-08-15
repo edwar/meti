@@ -1,9 +1,8 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, DollarSign, ArrowRight, Tag, Percent } from "lucide-react";
+import { Clock, ArrowRight, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency, formatDuration, type Service } from "@/lib/slots";
 
@@ -39,7 +38,8 @@ export function ServiceSelector({
               : Math.round(promo.discountValue * 100)
             : 0;
           const priceAfterDiscount = Math.max(service.priceCents - discount, 0);
-          const priceWithFee = Math.round(priceAfterDiscount * 1.15);
+          // Fee siempre sobre el precio original (el descuento lo absorbe el asesor)
+          const priceWithFee = Math.round(service.priceCents * 1.15);
 
           return (
             <Card
@@ -85,15 +85,11 @@ export function ServiceSelector({
                       <span className="flex items-center gap-1">
                         {discount > 0 ? (
                           <>
-                            <DollarSign className="w-4 h-4" />
                             <span className="line-through">{formatCurrency(service.priceCents)}</span>
                             <span className="text-[var(--accent)] font-semibold">{formatCurrency(priceWithFee)}</span>
                           </>
                         ) : (
-                          <>
-                            <DollarSign className="w-4 h-4" />
-                            {formatCurrency(priceWithFee)}
-                          </>
+                          <>{formatCurrency(priceWithFee)}</>
                         )}
                       </span>
                     </div>
