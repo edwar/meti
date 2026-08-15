@@ -37,6 +37,7 @@ export default function ServicesPage() {
   const dialog = useDialog();
   const [showModal, setShowModal] = useState(false);
   const [editingService, setEditingService] = useState<any>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { data, isLoading } = useAdvisorServices();
   const createService = useCreateService();
@@ -54,6 +55,7 @@ export default function ServicesPage() {
     );
 
     if (confirmed) {
+      setDeletingId(id);
       deleteService.mutate(id, {
         onSuccess: () => {
           dialog.showAlert("Éxito", "Servicio eliminado correctamente", "success");
@@ -61,15 +63,29 @@ export default function ServicesPage() {
         onError: () => {
           dialog.showAlert("Error", "Error al eliminar servicio", "error");
         },
+        onSettled: () => {
+          setDeletingId(null);
+        },
       });
     }
   };
 
   const handleToggleActive = (service: any) => {
-    updateService.mutate({
-      id: service.id,
-      isActive: !service.isActive,
-    });
+    updateService.mutate(
+      { id: service.id, isActive: !service.isActive },
+      {
+        onSuccess: () => {
+          dialog.showAlert(
+            "Éxito",
+            `Servicio ${service.isActive ? "desactivado" : "activado"} correctamente`,
+            "success"
+          );
+        },
+        onError: () => {
+          dialog.showAlert("Error", "Error al cambiar estado del servicio", "error");
+        },
+      }
+    );
   };
 
   if (isLoading) return <LoadingPage />;
@@ -182,9 +198,14 @@ export default function ServicesPage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(service.id, service.name)}
+                      disabled={deletingId === service.id}
                       className="text-[var(--error)] hover:text-[var(--error)]"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      {deletingId === service.id ? (
+                        <div className="w-4 h-4 border-2 border-[var(--error)] border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -216,12 +237,28 @@ export default function ServicesPage() {
           }}
           onSubmit={(data) => {
             if (editingService) {
-              updateService.mutate({ id: editingService.id, ...data });
+              updateService.mutate(data, {
+                onSuccess: () => {
+                  dialog.showAlert("Éxito", "Servicio actualizado correctamente", "success");
+                  setShowModal(false);
+                  setEditingService(null);
+                },
+                onError: (err: any) => {
+                  dialog.showAlert("Error", err.message || "Error al actualizar el servicio", "error");
+                },
+              });
             } else {
-              createService.mutate(data);
+              createService.mutate(data, {
+                onSuccess: () => {
+                  dialog.showAlert("Éxito", "Servicio creado correctamente", "success");
+                  setShowModal(false);
+                  setEditingService(null);
+                },
+                onError: (err: any) => {
+                  dialog.showAlert("Error", err.message || "Error al crear el servicio", "error");
+                },
+              });
             }
-            setShowModal(false);
-            setEditingService(null);
           }}
           isLoading={createService.isPending || updateService.isPending}
         />
