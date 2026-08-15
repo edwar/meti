@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, DollarSign, AlertCircle } from "lucide-react";
+import { Calendar, Clock, DollarSign, AlertCircle, Tag } from "lucide-react";
 import { formatCurrency, formatDuration, type Service, type DaySlots } from "@/lib/slots";
 
 interface BookingSummaryProps {
@@ -22,8 +22,16 @@ export function BookingSummary({
   onConfirm,
   isProcessing = false,
 }: BookingSummaryProps) {
-  const priceWithFee = Math.round(service.priceCents * 1.15);
+  const promo = service.promotion;
+  const discountCents = promo
+    ? promo.discountType === "percentage"
+      ? Math.round(service.priceCents * promo.discountValue / 100)
+      : Math.round(promo.discountValue * 100)
+    : 0;
+  const priceAfterDiscount = Math.max(service.priceCents - discountCents, 0);
   const fee = Math.round(service.priceCents * 0.15);
+  const totalOriginal = service.priceCents + fee;
+  const totalWithDiscount = priceAfterDiscount + fee;
 
   return (
     <div className="space-y-4">
@@ -79,11 +87,22 @@ export function BookingSummary({
           </div>
 
           {/* Price */}
-          <div className="border-t border-[var(--border)] pt-4">
+          <div className="border-t border-[var(--border)] pt-4 space-y-2">
+            {discountCents > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="flex items-center gap-1 text-[var(--accent)]">
+                  <Tag className="w-4 h-4" />
+                  {promo!.name}
+                </span>
+                <span className="text-[var(--accent)] font-medium">
+                  -{formatCurrency(discountCents)}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between font-heading font-bold text-lg">
               <span className="text-[var(--text-primary)]">Total</span>
               <span className="text-[var(--primary)]">
-                {formatCurrency(priceWithFee)}
+                {discountCents > 0 ? formatCurrency(totalWithDiscount) : formatCurrency(totalOriginal)}
               </span>
             </div>
             <p className="text-xs text-[var(--text-muted)] mt-1">
