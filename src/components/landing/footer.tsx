@@ -5,7 +5,6 @@ const footerLinks = {
   platform: [
     { name: "Cómo funciona", href: "#como-funciona" },
     { name: "Explorar asesores", href: "/services" },
-    { name: "Precios", href: "#precios" },
     { name: "Preguntas frecuentes", href: "/faq" },
   ],
   advisors: [

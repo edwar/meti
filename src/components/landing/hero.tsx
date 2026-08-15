@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[var(--secondary)] via-[var(--secondary)] to-[var(--secondary-light)] text-white">
+    <section className="relative overflow-hidden bg-linear-to-br from-secondary via-secondary to-secondary-light text-white">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div
@@ -27,21 +27,17 @@ export function Hero() {
       </div>
 
       {/* Floating elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 rounded-2xl bg-[var(--primary)]/20 blur-xl animate-float" />
-      <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full bg-[var(--accent)]/20 blur-xl animate-float" style={{ animationDelay: "1s" }} />
-      <div className="absolute top-1/2 left-1/4 w-16 h-16 rounded-lg bg-[var(--primary)]/10 blur-lg animate-float" style={{ animationDelay: "2s" }} />
+      <div className="absolute top-20 left-10 w-20 h-20 rounded-2xl bg-primary/20 blur-xl animate-float" />
+      <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full bg-accent/20 blur-xl animate-float" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-1/2 left-1/4 w-16 h-16 rounded-lg bg-primary/10 blur-lg animate-float" style={{ animationDelay: "2s" }} />
 
       <div className="container-meti relative py-20 md:py-32 lg:py-40">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Logo + Brand — visible for crawlers */}
-          <div className="mb-6">
-            <img src="/logo-wordmark.svg" alt="Meti" className="h-14 w-auto mx-auto" />
-          </div>
 
           {/* Headline */}
           <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 animate-fade-in-up">
             Tu próximo asesor,{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary)] to-[var(--accent)]">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-accent">
               a un click
             </span>
           </h1>
@@ -55,11 +51,11 @@ export function Hero() {
           {/* Search Bar */}
           <div className="max-w-xl mx-auto mb-8 animate-fade-in-up stagger-2">
             <div className="relative flex items-center bg-white rounded-xl shadow-2xl p-1.5 hover:shadow-3xl transition-shadow duration-300">
-              <Search className="absolute left-4 w-5 h-5 text-[var(--text-muted)]" />
+              <Search className="absolute left-4 w-5 h-5 text-text-muted" />
               <input
                 type="text"
                 placeholder="¿Qué tipo de asesoría necesitas?"
-                className="flex-1 h-12 pl-12 pr-4 bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none text-base"
+                className="flex-1 h-12 pl-12 pr-4 bg-transparent text-text-primary placeholder:text-text-muted focus:outline-none text-base"
               />
               <Button size="lg" className="rounded-lg px-6 shadow-lg hover:shadow-xl" asChild>
                 <Link href="/services">
@@ -81,7 +77,7 @@ export function Hero() {
               <div className="text-sm text-white/70">Asesorías realizadas</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-heading font-bold text-[var(--accent)]">4.9★</div>
+              <div className="text-3xl font-heading font-bold text-accent">4.9★</div>
               <div className="text-sm text-white/70">Calificación promedio</div>
             </div>
           </div>
@@ -89,7 +85,7 @@ export function Hero() {
       </div>
 
       {/* Bottom Gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[var(--background)] to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-background to-transparent" />
     </section>
   );
 }
