@@ -9,9 +9,9 @@ import { parseLocalISO } from "@/lib/timezone";
 const appointmentSchema = z.object({
   advisorId: z.string(),
   serviceId: z.string(),
-  // Fecha/hora local (Colombia) en formato YYYY-MM-DDTHH:MM:SS sin offset.
-  // El servidor la interpreta con la timezone de la app (ver parseLocalISO).
   scheduledAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/),
+  discountCents: z.number().min(0).default(0),
+  promotionId: z.string().nullable().default(null),
 });
 
 // POST: Create appointment (PENDING) + Mercado Pago Checkout Pro preference
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { advisorId, serviceId, scheduledAt } = appointmentSchema.parse(body);
+    const { advisorId, serviceId, scheduledAt, discountCents, promotionId } = appointmentSchema.parse(body);
 
     // Get advisor profile
     const advisorProfile = await prisma.advisorProfile.findUnique({
@@ -65,8 +65,9 @@ export async function POST(request: NextRequest) {
       feePercentage = advisorCategories[0].category.feePercentage;
     }
 
-    // Calculate prices
-    const advisorEarning = service.priceCents;
+    // Calculate prices — descuento se aplica antes del fee
+    const priceAfterDiscount = Math.max(service.priceCents - discountCents, 0);
+    const advisorEarning = priceAfterDiscount;
     const platformFee = Math.round(advisorEarning * (feePercentage / 100));
     const totalCents = advisorEarning + platformFee;
 
@@ -87,6 +88,7 @@ export async function POST(request: NextRequest) {
         totalCents,
         advisorEarning,
         platformFee,
+        discountCents,
       },
     });
 

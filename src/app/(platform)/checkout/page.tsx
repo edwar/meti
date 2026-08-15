@@ -14,6 +14,7 @@ import {
   User,
   CreditCard,
   Shield,
+  Tag,
   ArrowLeft,
   AlertTriangle,
   LogIn,
@@ -34,6 +35,7 @@ function CheckoutContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [advisorHasMP, setAdvisorHasMP] = useState<boolean | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [promotion, setPromotion] = useState<any>(null);
 
   const advisorId = searchParams.get("advisorId");
   const advisorName = searchParams.get("advisorName") || "Asesor";
@@ -44,8 +46,15 @@ function CheckoutContent() {
   const date = searchParams.get("date") || "Por definir";
   const time = searchParams.get("time") || "Por definir";
 
-  const serviceFee = Math.round(servicePrice * 0.15);
-  const serviceTotal = servicePrice + serviceFee;
+  // Calcular descuento si hay promoción activa
+  const discountCents = promotion
+    ? promotion.discountType === "percentage"
+      ? Math.round(servicePrice * promotion.discountValue / 100)
+      : Math.min(promotion.discountValue, servicePrice)
+    : 0;
+  const priceAfterDiscount = Math.max(servicePrice - discountCents, 0);
+  const serviceFee = Math.round(priceAfterDiscount * 0.15);
+  const serviceTotal = priceAfterDiscount + serviceFee;
 
   useEffect(() => {
     // Consume el booking pendiente guardado antes del login (lo deja /redirect sin borrar)
@@ -54,7 +63,20 @@ function CheckoutContent() {
     if (advisorId) {
       checkAdvisorMP(advisorId);
     }
-  }, [advisorId]);
+    if (serviceId) {
+      fetchPromotion(serviceId);
+    }
+  }, [advisorId, serviceId]);
+
+  const fetchPromotion = async (sid: string) => {
+    try {
+      const res = await fetch(`/api/promotions?serviceId=${sid}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.promotion) setPromotion(data.promotion);
+      }
+    } catch {}
+  };
 
   const checkLoginStatus = async () => {
     try {
@@ -127,9 +149,9 @@ function CheckoutContent() {
         body: JSON.stringify({
           advisorId,
           serviceId,
-          // Enviar hora local (Colombia) SIN convertir a UTC: el servidor la interpreta
-          // con la timezone de la app. Evita doble conversión de timezone.
           scheduledAt: `${date}T${time}:00`,
+          discountCents,
+          promotionId: promotion?.id || null,
         }),
       });
 
@@ -297,9 +319,30 @@ function CheckoutContent() {
                     </div>
                   </div>
 
-                  <div className="border-t border-[var(--border)] pt-4">
-                    <div className="flex justify-between font-heading font-bold text-lg">
-                      <span className="text-[var(--text-primary)]">{serviceName}</span>
+                  <div className="border-t border-[var(--border)] pt-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[var(--text-muted)]">{serviceName}</span>
+                      {discountCents > 0 ? (
+                        <span className="text-[var(--text-muted)] line-through">{formatCurrency(servicePrice)}</span>
+                      ) : (
+                        <span className="text-[var(--text-primary)]">{formatCurrency(servicePrice)}</span>
+                      )}
+                    </div>
+                    {discountCents > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[var(--accent)] flex items-center gap-1">
+                          <Tag className="w-3.5 h-3.5" />
+                          {promotion.name}
+                        </span>
+                        <span className="text-[var(--accent)] font-medium">-{formatCurrency(discountCents)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[var(--text-muted)]">Fee de plataforma (15%)</span>
+                      <span className="text-[var(--text-primary)]">{formatCurrency(serviceFee)}</span>
+                    </div>
+                    <div className="border-t border-[var(--border)] pt-3 flex justify-between font-heading font-bold text-lg">
+                      <span className="text-[var(--text-primary)]">Total</span>
                       <span className="text-[var(--primary)]">{formatCurrency(serviceTotal)}</span>
                     </div>
                     <p className="text-xs text-[var(--text-muted)]">Incluye todos los costos</p>

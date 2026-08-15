@@ -331,6 +331,7 @@ model Appointment {
   totalCents      Int               // Final price (service + fee)
   advisorEarning  Int               // What advisor earns
   platformFee     Int               // Platform fee
+  discountCents   Int  @default(0)  // Descuento aplicado (promoción)
   paymentId       String?           // Mercado Pago payment ID
   mpPreferenceId  String?           // Mercado Pago preference ID (Checkout Pro)
 

@@ -11,6 +11,7 @@ import {
   Calendar,
   User,
   CreditCard,
+  Tag,
   Settings,
   LogOut,
   Menu,
@@ -44,6 +45,11 @@ const navigation = [
     name: "Pagos",
     href: "/advisor/payments",
     icon: CreditCard,
+  },
+  {
+    name: "Promociones",
+    href: "/advisor/promotions",
+    icon: Tag,
   },
   {
     name: "Configuración MP",
