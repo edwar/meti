@@ -55,6 +55,7 @@ function CheckoutContent() {
   const priceAfterDiscount = Math.max(servicePrice - discountCents, 0);
   // El fee siempre se calcula sobre el precio ORIGINAL (el descuento lo absorbe el asesor)
   const serviceFee = Math.round(servicePrice * 0.15);
+  const totalOriginal = servicePrice + serviceFee;
   const serviceTotal = priceAfterDiscount + serviceFee;
 
   useEffect(() => {
@@ -330,9 +331,9 @@ function CheckoutContent() {
                     <div className="flex justify-between text-sm">
                       <span className="text-[var(--text-muted)]">{serviceName}</span>
                       {discountCents > 0 ? (
-                        <span className="text-[var(--text-muted)] line-through">{formatCurrency(serviceTotal)}</span>
+                        <span className="text-[var(--text-muted)] line-through">{formatCurrency(totalOriginal)}</span>
                       ) : (
-                        <span className="text-[var(--text-primary)]">{formatCurrency(serviceTotal)}</span>
+                        <span className="text-[var(--text-primary)]">{formatCurrency(totalOriginal)}</span>
                       )}
                     </div>
                     {discountCents > 0 && (
