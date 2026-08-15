@@ -33,6 +33,7 @@ function ResultContent() {
   const searchParams = useSearchParams();
   const appointmentId = searchParams.get("appointmentId");
   const statusParam = (searchParams.get("status") || "unknown") as ResultStatus;
+  const paymentId = searchParams.get("payment_id");
 
   const [appointment, setAppointment] = useState<ResultAppointment | null>(null);
   const [isLoading, setIsLoading] = useState(!!appointmentId);
@@ -60,6 +61,30 @@ function ResultContent() {
       setIsLoading(false);
     }
   }, [appointmentId]);
+
+  // Si viene payment_id de MP, verificar el pago directamente con la API
+  useEffect(() => {
+    if (!appointmentId || !paymentId) return;
+    const verifyPayment = async () => {
+      try {
+        const res = await fetch(`/api/appointments/${appointmentId}/verify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ paymentId }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.confirmed) {
+            await fetchAppointment();
+          }
+        }
+      } catch (error) {
+        console.error("Error verifying payment:", error);
+      }
+    };
+    verifyPayment();
+  }, [appointmentId, paymentId, fetchAppointment]);
 
   useEffect(() => {
     const load = async () => {
