@@ -15,7 +15,6 @@ import {
   CreditCard,
   Shield,
   ArrowLeft,
-  CheckCircle,
   AlertTriangle,
   LogIn,
 } from "lucide-react";
@@ -33,7 +32,6 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const dialog = useDialog();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
   const [advisorHasMP, setAdvisorHasMP] = useState<boolean | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
@@ -120,7 +118,7 @@ function CheckoutContent() {
     }
 
     setIsProcessing(true);
-    
+
     try {
       const res = await fetch("/api/appointments", {
         method: "POST",
@@ -138,13 +136,14 @@ function CheckoutContent() {
         throw new Error(data.error || "Error creating appointment");
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setIsComplete(true);
+      const { initPoint } = await res.json();
+
+      // Redirigir al checkout de Mercado Pago (el pago confirma la cita vía webhook)
       localStorage.removeItem("meti-pending-booking");
+      window.location.href = initPoint;
     } catch (error) {
       console.error("Error:", error);
       dialog.showAlert("Error", "Error al crear la cita. Intenta de nuevo.", "error");
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -165,32 +164,7 @@ function CheckoutContent() {
     );
   }
 
-  // Success state
-  if (isComplete) {
-    return (
-      <>
-        <div className="min-h-screen bg-[var(--background)] flex items-center justify-center px-4">
-          <Card className="w-full max-w-md">
-            <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 rounded-full bg-[var(--success-light)] flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-[var(--success)]" />
-              </div>
-              <h1 className="font-heading text-2xl font-bold text-[var(--text-primary)] mb-2">
-                ¡Reserva confirmada!
-              </h1>
-              <p className="text-[var(--text-muted)] mb-6">
-                Recibirás un correo con los detalles de tu asesoría y el enlace de videollamada.
-              </p>
-              <Button className="w-full" onClick={() => router.push("/dashboard")}>
-                Ir a mi panel
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-        <AlertDialog state={dialog} />
-      </>
-    );
-  }
+  // Success state (ahora se maneja en /checkout/result tras el pago en MP)
 
   // Main checkout view
   return (

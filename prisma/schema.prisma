@@ -332,6 +332,7 @@ model Appointment {
   advisorEarning  Int               // What advisor earns
   platformFee     Int               // Platform fee
   paymentId       String?           // Mercado Pago payment ID
+  mpPreferenceId  String?           // Mercado Pago preference ID (Checkout Pro)
 
   // LiveKit
   liveKitRoomId   String?

@@ -281,8 +281,8 @@ Estado actual: **MVP en desarrollo**.
 - [x] Autenticación con Google OAuth (better-auth)
 - [x] Perfiles de asesores, servicios y agenda recurrente
 - [x] Booking con slots automáticos y checkout
+- [x] Webhooks de Mercado Pago (confirmación de pago real)
 - [x] Panel admin (verificación, fees, usuarios)
-- [ ] Webhooks de Mercado Pago (confirmación de pago real)
 - [ ] Notificaciones (Sileo): recordatorios y alertas de booking
 - [ ] Promociones por fechas especiales
 - [ ] Facturación mensual automática para asesores
