@@ -24,6 +24,31 @@ export const metadata: Metadata = {
   title: "Meti - Asesorías Profesionales Online",
   description:
     "Conecta con asesores profesionales en línea. Videollamadas, chat y gestión completa de asesorías.",
+  icons: {
+    icon: [
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+  },
+  manifest: "/manifest.json",
+  openGraph: {
+    title: "Meti - Asesorías Profesionales Online",
+    description:
+      "Conecta con asesores profesionales en línea. Videollamadas, chat y gestión completa de asesorías.",
+    siteName: "Meti",
+    type: "website",
+    url: "https://meti.cognilab.dev",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Meti - Asesorías Profesionales Online",
+    description:
+      "Conecta con asesores profesionales en línea. Videollamadas, chat y gestión completa de asesorías.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
