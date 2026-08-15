@@ -104,7 +104,7 @@ export default function PromotionsPage() {
                       <p className="text-sm text-[var(--text-muted)]">Servicio: {promo.service.name}</p>
                       <div className="flex items-center gap-4 mt-2 text-sm">
                         <span className="flex items-center gap-1 text-[var(--primary)] font-semibold">
-                          {promo.discountType === "percentage" ? <><Percent className="w-4 h-4" />{promo.discountValue}%</> : <><DollarSign className="w-4 h-4" />{formatCurrency(promo.discountValue)}</>}
+                          {promo.discountType === "percentage" ? <><Percent className="w-4 h-4" />{promo.discountValue}%</> : <><DollarSign className="w-4 h-4" />{formatCurrency(promo.discountValue * 100)}</>}
                         </span>
                         <span className="flex items-center gap-1 text-[var(--text-muted)]">
                           <Clock className="w-3.5 h-3.5" />

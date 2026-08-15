@@ -36,7 +36,7 @@ export function ServiceSelector({
           const discount = promo
             ? promo.discountType === "percentage"
               ? Math.round(service.priceCents * promo.discountValue / 100)
-              : Math.min(promo.discountValue, service.priceCents)
+              : Math.round(promo.discountValue * 100)
             : 0;
           const priceAfterDiscount = Math.max(service.priceCents - discount, 0);
           const priceWithFee = Math.round(priceAfterDiscount * 1.15);
@@ -72,7 +72,7 @@ export function ServiceSelector({
                             <span> -{promo.discountValue}%</span>
                           )}
                           {promo.discountType === "fixed" && (
-                            <span> -{formatCurrency(promo.discountValue)}</span>
+                            <span> -{formatCurrency(promo.discountValue * 100)}</span>
                           )}
                         </Badge>
                       )}

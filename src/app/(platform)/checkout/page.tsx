@@ -46,11 +46,11 @@ function CheckoutContent() {
   const date = searchParams.get("date") || "Por definir";
   const time = searchParams.get("time") || "Por definir";
 
-  // Calcular descuento si hay promoción activa
+  // Calcular descuento si hay promoción activa (fijo viene en pesos, convertir a centavos)
   const discountCents = promotion
     ? promotion.discountType === "percentage"
       ? Math.round(servicePrice * promotion.discountValue / 100)
-      : Math.min(promotion.discountValue, servicePrice)
+      : Math.min(Math.round(promotion.discountValue * 100), servicePrice)
     : 0;
   const priceAfterDiscount = Math.max(servicePrice - discountCents, 0);
   const serviceFee = Math.round(priceAfterDiscount * 0.15);
