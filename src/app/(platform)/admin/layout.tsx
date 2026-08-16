@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Logo } from "@/components/ui/logo";
 
 const navigation = [
   {
@@ -128,10 +129,7 @@ export default function AdminLayout({
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-white/10">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[var(--primary)]">
-                <span className="text-white font-heading font-bold text-lg">M</span>
-              </div>
-              <span className="font-heading font-bold text-xl">Meti</span>
+              <Logo className="h-9 w-auto" />
             </Link>
             <button
               className="lg:hidden p-1 text-white/70 hover:text-white"

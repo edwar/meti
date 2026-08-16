@@ -6,6 +6,7 @@ import { authClient } from "@/lib/auth-client";
 import { VideoCall } from "@/components/video/video-call";
 import { WaitingRoom } from "@/components/video/waiting-room";
 import { LoadingPage } from "@/components/ui/loading";
+import { Logo } from "@/components/ui/logo";
 
 export default function CallPage({
   params,
@@ -52,12 +53,7 @@ export default function CallPage({
       <header className="border-b border-[var(--border)] bg-[var(--surface)]">
         <div className="container-meti flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[var(--primary)]">
-              <span className="text-white font-heading font-bold text-lg">M</span>
-            </div>
-            <span className="font-heading font-bold text-xl text-[var(--secondary)]">
-              Meti
-            </span>
+            <Logo className="h-9 w-auto" />
           </div>
           <div className="flex items-center gap-4">
             {user.image && (
