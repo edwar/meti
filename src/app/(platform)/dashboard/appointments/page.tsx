@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingPage } from "@/components/ui/loading";
-import { Calendar, Clock, Video, Star } from "lucide-react";
+import { Calendar, Clock, Video, Star, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { sileo } from "sileo";
+import { cn } from "@/lib/utils";
 
 interface Appointment {
   id: string;
@@ -19,12 +21,17 @@ interface Appointment {
   totalCents: number;
   service: { name: string };
   advisor: { user: { name: string; image: string | null } };
+  review?: { id: string; rating: number; comment: string | null } | null;
 }
 
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
+  const [reviewAppointment, setReviewAppointment] = useState<Appointment | null>(null);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchAppointments();
@@ -77,6 +84,36 @@ export default function AppointmentsPage() {
     }).format(cents);
   };
 
+  const openReview = (apt: Appointment) => {
+    setReviewAppointment(apt);
+    setRating(apt.review?.rating || 0);
+    setComment(apt.review?.comment || "");
+  };
+
+  const submitReview = async () => {
+    if (!reviewAppointment || rating === 0) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`/api/appointments/${reviewAppointment.id}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ rating, comment: comment || undefined }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Error al guardar la reseña");
+      }
+      sileo.success({ title: "¡Gracias por tu reseña!", description: "Tu calificación ayuda a otros clientes." });
+      setReviewAppointment(null);
+      await fetchAppointments();
+    } catch (err: any) {
+      sileo.error({ title: "Error", description: err.message || "No se pudo guardar la reseña." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (isLoading) return <LoadingPage />;
 
   return (
@@ -126,7 +163,7 @@ export default function AppointmentsPage() {
               description="Explora nuestros asesores y agenda tu primera asesoría."
               action={{
                 label: "Explorar asesores",
-                onClick: () => window.location.href = "/services",
+                onClick: () => (window.location.href = "/services"),
               }}
             />
           </CardContent>
@@ -185,11 +222,90 @@ export default function AppointmentsPage() {
                         </Link>
                       </Button>
                     )}
+                    {apt.status === "COMPLETED" && (
+                      <Button size="sm" variant={apt.review ? "secondary" : "default"} onClick={() => openReview(apt)}>
+                        {apt.review ? (
+                          <>
+                            <Star className="w-4 h-4 mr-1 text-[var(--star)]" />
+                            {apt.review.rating}★
+                          </>
+                        ) : (
+                          <>
+                            <MessageSquare className="w-4 h-4 mr-1" />
+                            Reseña
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Review Modal */}
+      {reviewAppointment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-lg">
+                {reviewAppointment.review ? "Tu reseña" : "Califica tu asesoría"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-[var(--text-muted)]">
+                {reviewAppointment.service.name} con {reviewAppointment.advisor.user.name}
+              </p>
+
+              {/* Stars */}
+              <div className="flex justify-center gap-2 py-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setRating(star)}
+                    disabled={!!reviewAppointment.review}
+                    className={cn(
+                      "transition-transform hover:scale-110",
+                      star <= rating ? "text-[var(--star)]" : "text-[var(--star-empty)]"
+                    )}
+                    aria-label={`${star} estrellas`}
+                  >
+                    <Star className="w-8 h-8 fill-current" />
+                  </button>
+                ))}
+              </div>
+
+              {/* Comment */}
+              {reviewAppointment.review ? (
+                reviewAppointment.review.comment && (
+                  <p className="text-sm text-[var(--text-secondary)] bg-[var(--background)] rounded-lg p-3">
+                    {reviewAppointment.review.comment}
+                  </p>
+                )
+              ) : (
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Cuéntanos sobre tu experiencia (opcional)..."
+                  rows={3}
+                  className="w-full px-3 py-2 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--primary)] resize-none"
+                />
+              )}
+
+              <div className="flex gap-3 justify-end pt-2">
+                <Button variant="secondary" onClick={() => setReviewAppointment(null)}>
+                  Cerrar
+                </Button>
+                {!reviewAppointment.review && (
+                  <Button onClick={submitReview} disabled={isSubmitting || rating === 0}>
+                    {isSubmitting ? "Guardando..." : "Enviar reseña"}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

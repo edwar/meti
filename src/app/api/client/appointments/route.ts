@@ -24,6 +24,7 @@ export async function GET() {
           include: { user: true },
         },
         service: true,
+        review: true,
       },
       orderBy: { scheduledAt: "desc" },
     });
