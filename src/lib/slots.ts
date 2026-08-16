@@ -93,7 +93,8 @@ export function generateAvailableSlots(
   serviceDuration: number,
   existingAppointments: Array<{ start: Date; end: Date }> = [],
   blockedTimes: BlockedTime[] = [],
-  slotDate?: Date
+  slotDate?: Date,
+  minStartTime?: Date
 ): TimeSlot[] {
   const slots: TimeSlot[] = [];
   const start = timeToMinutes(schedule.startTime);
@@ -133,9 +134,17 @@ export function generateAvailableSlots(
       ? isSlotBlocked(slotDate, current, current + serviceDuration, blockedTimes)
       : false;
 
+    // Anticipación mínima: ocultar slots que empiezan antes de minStartTime
+    const isTooSoon = (() => {
+      if (!slotDate || !minStartTime) return false;
+      const slotStart = new Date(slotDate);
+      slotStart.setHours(Math.floor(current / 60), current % 60, 0, 0);
+      return slotStart.getTime() < minStartTime.getTime();
+    })();
+
     slots.push({
       time: slotTime,
-      available: !hasAppointmentConflict && !hasBlockedConflict,
+      available: !hasAppointmentConflict && !hasBlockedConflict && !isTooSoon,
     });
 
     current += serviceDuration + gap;
@@ -148,9 +157,11 @@ export function getAvailableDates(
   schedules: Schedule[],
   serviceDuration: number,
   weeksToShow: number = 2,
-  blockedTimes: BlockedTime[] = []
+  blockedTimes: BlockedTime[] = [],
+  leadHours: number = 0
 ): DaySlots[] {
   const today = startOfDay(new Date());
+  const minStartTime = leadHours > 0 ? new Date(Date.now() + leadHours * 60 * 60 * 1000) : undefined;
   const dates: DaySlots[] = [];
 
   for (let i = 0; i < weeksToShow * 7; i++) {
@@ -174,7 +185,8 @@ export function getAvailableDates(
         serviceDuration,
         [],
         blockedTimes,
-        date
+        date,
+        minStartTime
       );
       const hasAvailability = slots.some((s) => s.available);
 

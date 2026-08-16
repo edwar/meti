@@ -36,6 +36,7 @@ interface Advisor {
   bio: string | null;
   videoUrl: string | null;
   isVerified: boolean;
+  bookingLeadHours: number;
   rating: number;
   reviewCount: number;
   categories: string[];
@@ -89,7 +90,7 @@ export default function AdvisorProfilePage({ params }: { params: Promise<{ id: s
 
   const availableDates = useMemo(() => {
     if (!selectedService || !advisor?.schedule?.length) return [];
-    return getAvailableDates(advisor.schedule, selectedService.durationMin);
+    return getAvailableDates(advisor.schedule, selectedService.durationMin, 2, [], advisor.bookingLeadHours || 0);
   }, [selectedService, advisor?.schedule]);
 
   // Disponibilidad REAL: consulta las citas existentes vía API por cada fecha.

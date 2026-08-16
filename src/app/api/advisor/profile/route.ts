@@ -8,6 +8,7 @@ const profileSchema = z.object({
   bio: z.string().optional(),
   speciality: z.string().optional(),
   videoUrl: z.string().url().optional().or(z.literal("")),
+  bookingLeadHours: z.number().int().min(0).max(168).optional(),
 });
 
 // GET: Get profile
@@ -110,6 +111,9 @@ export async function PUT(request: NextRequest) {
         bio: validatedData.bio || null,
         speciality: validatedData.speciality || null,
         videoUrl: validatedData.videoUrl || null,
+        ...(validatedData.bookingLeadHours !== undefined
+          ? { bookingLeadHours: validatedData.bookingLeadHours }
+          : {}),
       },
     });
 

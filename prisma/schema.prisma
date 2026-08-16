@@ -118,6 +118,9 @@ model AdvisorProfile {
   isVerified      Boolean  @default(false)
   verificationStatus String @default("NONE") // NONE | PENDING_AI | PENDING_MANUAL | APPROVED | REJECTED
   verificationNotes String? @db.Text
+
+  // Booking
+  bookingLeadHours Int      @default(0) // Anticipación mínima para agendar (horas)
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

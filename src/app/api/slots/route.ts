@@ -46,6 +46,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Anticipación mínima definida por el asesor (bookingLeadHours)
+    const advisorProfile = await prisma.advisorProfile.findUnique({
+      where: { id: advisorId },
+      select: { bookingLeadHours: true },
+    });
+    const minStartTime =
+      advisorProfile && advisorProfile.bookingLeadHours > 0
+        ? new Date(Date.now() + advisorProfile.bookingLeadHours * 60 * 60 * 1000)
+        : undefined;
+
     // Get existing appointments for that date (en timezone de la app, Colombia UTC-5)
     const [y, m, d] = date.split("-").map(Number);
     const startOfDay = new Date(Date.UTC(y, m - 1, d, -APP_TIMEZONE_OFFSET_HOURS, 0, 0, 0));
@@ -84,7 +94,7 @@ export async function GET(request: NextRequest) {
       gapMinutes: schedule.gapMinutes,
     };
 
-    const slots = generateAvailableSlots(scheduleData, service.durationMin, appointments);
+    const slots = generateAvailableSlots(scheduleData, service.durationMin, appointments, [], undefined, minStartTime);
 
     return NextResponse.json({ slots });
   } catch (error) {

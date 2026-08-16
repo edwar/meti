@@ -65,6 +65,7 @@ export async function GET(
         bio: advisor.bio,
         videoUrl: advisor.videoUrl,
         isVerified: advisor.isVerified,
+        bookingLeadHours: advisor.bookingLeadHours,
         rating: Math.round(avgRating * 10) / 10,
         reviewCount: reviews.length,
         categories: advisor.categories.map((ac: any) => ac.category.name),
