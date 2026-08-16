@@ -28,6 +28,17 @@ export default function CallPage({
           return;
         }
         setUser(data.user);
+
+        // Si la cita ya está en progreso, entrar directamente a la llamada
+        try {
+          const res = await fetch(`/api/appointments/${appointmentId}`, { credentials: "include" });
+          if (res.ok) {
+            const { appointment } = await res.json();
+            if (appointment?.status === "IN_PROGRESS") {
+              setInCall(true);
+            }
+          }
+        } catch {}
       } catch (error) {
         router.push("/login");
       } finally {
@@ -36,7 +47,7 @@ export default function CallPage({
     };
 
     checkSession();
-  }, [router]);
+  }, [router, appointmentId]);
 
   if (isLoading) {
     return <LoadingPage />;

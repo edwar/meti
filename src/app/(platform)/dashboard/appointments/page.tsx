@@ -265,7 +265,6 @@ export default function AppointmentsPage() {
                   <button
                     key={star}
                     onClick={() => setRating(star)}
-                    disabled={!!reviewAppointment.review}
                     className={cn(
                       "transition-transform hover:scale-110",
                       star <= rating ? "text-[var(--star)]" : "text-[var(--star-empty)]"
@@ -278,31 +277,25 @@ export default function AppointmentsPage() {
               </div>
 
               {/* Comment */}
-              {reviewAppointment.review ? (
-                reviewAppointment.review.comment && (
-                  <p className="text-sm text-[var(--text-secondary)] bg-[var(--background)] rounded-lg p-3">
-                    {reviewAppointment.review.comment}
-                  </p>
-                )
-              ) : (
-                <textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Cuéntanos sobre tu experiencia (opcional)..."
-                  rows={3}
-                  className="w-full px-3 py-2 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--primary)] resize-none"
-                />
-              )}
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Cuéntanos sobre tu experiencia (opcional)..."
+                rows={3}
+                className="w-full px-3 py-2 text-sm border border-[var(--border)] rounded-lg bg-[var(--surface)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--primary)] resize-none"
+              />
 
               <div className="flex gap-3 justify-end pt-2">
                 <Button variant="secondary" onClick={() => setReviewAppointment(null)}>
                   Cerrar
                 </Button>
-                {!reviewAppointment.review && (
-                  <Button onClick={submitReview} disabled={isSubmitting || rating === 0}>
-                    {isSubmitting ? "Guardando..." : "Enviar reseña"}
-                  </Button>
-                )}
+                <Button onClick={submitReview} disabled={isSubmitting || rating === 0}>
+                  {isSubmitting
+                    ? "Guardando..."
+                    : reviewAppointment.review
+                      ? "Actualizar reseña"
+                      : "Enviar reseña"}
+                </Button>
               </div>
             </CardContent>
           </Card>

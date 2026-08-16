@@ -38,18 +38,22 @@ export async function POST(
       );
     }
 
-    // Una sola reseña por cita
+    const { rating, comment } = reviewSchema.parse(await request.json());
+
+    // Una sola reseña por cita — permitir actualizar si ya existe
     const existing = await prisma.review.findUnique({
       where: { appointmentId },
     });
     if (existing) {
-      return NextResponse.json(
-        { error: "Esta asesoría ya tiene una reseña" },
-        { status: 409 }
-      );
+      const updated = await prisma.review.update({
+        where: { id: existing.id },
+        data: {
+          rating,
+          comment: comment || null,
+        },
+      });
+      return NextResponse.json({ review: updated, updated: true });
     }
-
-    const { rating, comment } = reviewSchema.parse(await request.json());
 
     const review = await prisma.review.create({
       data: {

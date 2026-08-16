@@ -26,7 +26,7 @@ export function ChatPanel({ appointmentId, currentUserId, currentUserRole }: Cha
   const { chatMessages, send } = useChat();
   const [dbMessages, setDbMessages] = useState<PersistedMessage[]>([]);
   const [input, setInput] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Cargar historial persistido
