@@ -90,7 +90,7 @@ export default function AdvisorProfilePage({ params }: { params: Promise<{ id: s
 
   const availableDates = useMemo(() => {
     if (!selectedService || !advisor?.schedule?.length) return [];
-    return getAvailableDates(advisor.schedule, selectedService.durationMin, 2, [], advisor.bookingLeadHours || 0);
+    return getAvailableDates(advisor.schedule, selectedService.durationMin, 2, [], advisor.bookingLeadHours || 24);
   }, [selectedService, advisor?.schedule]);
 
   // Disponibilidad REAL: consulta las citas existentes vía API por cada fecha.

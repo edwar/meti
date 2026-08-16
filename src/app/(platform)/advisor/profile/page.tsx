@@ -42,7 +42,7 @@ export default function ProfilePage() {
     if (data?.profile) {
       setBio(data.profile.bio || "");
       setVideoUrl(data.profile.videoUrl || "");
-      setBookingLeadHours(data.profile.bookingLeadHours || 0);
+      setBookingLeadHours(data.profile.bookingLeadHours || 24);
       setSelectedCategoryIds((data.profile.categories || []).map((c: any) => c.id));
       fetchDocuments();
       fetchCategories();
@@ -261,42 +261,39 @@ export default function ProfilePage() {
                 </div>
               </CardContent>
             </Card>
+            {/* Configuración de agendado */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-[var(--primary)]" />
+                  Configuración de agendado
+                </CardTitle>
+                <CardDescription>
+                  Define con cuánta anticipación mínima los clientes pueden reservar
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={168}
+                    value={bookingLeadHours}
+                    onChange={(e) => {
+                      setBookingLeadHours(Math.max(0, Number(e.target.value)));
+                      setHasChanges(true);
+                    }}
+                    className="w-24 text-center"
+                  />
+                  <span className="text-sm text-[var(--text-muted)]">horas de anticipación</span>
+                </div>
+                <p className="text-xs text-[var(--text-muted)] mt-3">
+                  Ejemplo: si defines 6, los clientes no podrán reservar para las próximas 6 horas.
+                  Con 0, pueden agendar cualquier horario disponible del día.
+                </p>
+              </CardContent>
+            </Card>
           </div>
-
-          {/* Anticipación mínima */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-[var(--primary)]" />
-                Configuración de agendado
-              </CardTitle>
-              <CardDescription>
-                Define con cuánta anticipación mínima los clientes pueden reservar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-3">
-                <Input
-                  type="number"
-                  min={0}
-                  max={168}
-                  value={bookingLeadHours}
-                  onChange={(e) => {
-                    setBookingLeadHours(Math.max(0, Number(e.target.value)));
-                    setHasChanges(true);
-                  }}
-                  className="w-24 text-center"
-                />
-                <span className="text-sm text-[var(--text-muted)]">horas de anticipación</span>
-              </div>
-              <p className="text-xs text-[var(--text-muted)] mt-3">
-                Ejemplo: si defines 6, los clientes no podrán reservar para las próximas 6 horas.
-                Con 0, pueden agendar cualquier horario disponible del día.
-              </p>
-            </CardContent>
-          </Card>
-
-
 
           {/* Right Column - Rubros, Documentos y Video */}
           <div className="space-y-6">

@@ -120,7 +120,7 @@ model AdvisorProfile {
   verificationNotes String? @db.Text
 
   // Booking
-  bookingLeadHours Int      @default(0) // Anticipación mínima para agendar (horas)
+  bookingLeadHours Int      @default(24) // Anticipación mínima para agendar (horas)
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
