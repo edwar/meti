@@ -287,7 +287,7 @@ Estado actual: **MVP en desarrollo**.
 - [x] Promociones por fechas especiales
 - [x] Facturación mensual automática para asesores
 - [x] Modo oscuro
-- [ ] Grabación y chat persistente en videollamadas
+- [x] Grabación y chat persistente en videollamadas
 
 ## 📄 Licencia
 
