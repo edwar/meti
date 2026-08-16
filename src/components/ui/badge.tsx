@@ -10,7 +10,7 @@ const badgeVariants = cva(
         default:
           "bg-[var(--primary-light)] text-[var(--primary)]",
         secondary:
-          "bg-[var(--secondary)]/10 text-[var(--secondary)]",
+          "bg-[var(--secondary)]/10 text-[var(--secondary)] dark:bg-[var(--border)] dark:text-[var(--text-primary)]",
         accent:
           "bg-[var(--accent-light)] text-[var(--accent)]",
         success:

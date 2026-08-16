@@ -538,7 +538,7 @@ export default function OnboardingPage() {
             >
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-xl bg-[var(--secondary)]/10 flex items-center justify-center flex-shrink-0">
-                  <User className="w-6 h-6 text-[var(--secondary)]" />
+                  <User className="w-6 h-6 text-[var(--secondary)] dark:text-[var(--text-primary)]" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-heading font-semibold text-[var(--text-primary)]">
