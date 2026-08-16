@@ -50,7 +50,7 @@ export function Hero() {
 
           {/* Search Bar */}
           <div className="max-w-xl mx-auto mb-8 animate-fade-in-up stagger-2">
-            <div className="relative flex items-center bg-white rounded-xl shadow-2xl p-1.5 hover:shadow-3xl transition-shadow duration-300">
+            <div className="relative flex items-center bg-[var(--surface)] rounded-xl shadow-2xl p-1.5 hover:shadow-3xl transition-shadow duration-300">
               <Search className="absolute left-4 w-5 h-5 text-text-muted" />
               <input
                 type="text"

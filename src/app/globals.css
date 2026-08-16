@@ -78,6 +78,58 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ============================================
+   DARK MODE — se activa con .dark en <html>
+   ============================================ */
+
+.dark {
+  --primary: #ff7a47;
+  --primary-hover: #ff8f63;
+  --primary-light: rgba(255, 107, 53, 0.16);
+  --primary-dark: #cc5229;
+
+  --secondary: #12121f;
+  --secondary-light: #1e1e33;
+  --secondary-dark: #0a0a12;
+
+  --accent: #00e0b4;
+  --accent-hover: #2ce6c4;
+  --accent-light: rgba(0, 212, 170, 0.14);
+  --accent-dark: #00a88a;
+
+  --background: #0b0b14;
+  --surface: #15151f;
+  --border: #26263a;
+  --border-light: #1d1d2b;
+  --text-primary: #f2f2f8;
+  --text-secondary: #b9b9cc;
+  --text-muted: #85859c;
+
+  --success: #34d399;
+  --success-light: rgba(16, 185, 129, 0.16);
+  --success-dark: #059669;
+  --warning: #fbbf24;
+  --warning-light: rgba(245, 158, 11, 0.16);
+  --warning-dark: #d97706;
+  --error: #f87171;
+  --error-light: rgba(239, 68, 68, 0.16);
+  --error-dark: #dc2626;
+  --info: #60a5fa;
+  --info-light: rgba(59, 130, 246, 0.16);
+  --info-dark: #2563eb;
+
+  --star: #fbbf24;
+  --star-empty: #2d2d44;
+
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.55), 0 8px 10px -6px rgb(0 0 0 / 0.45);
+  --shadow-primary: 0 4px 14px 0 rgb(255 107 53 / 0.25);
+  --shadow-accent: 0 4px 14px 0 rgb(0 212 170 / 0.25);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);

@@ -7,6 +7,7 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { LoadingPage } from "@/components/ui/loading";
+import { Logo } from "@/components/ui/logo";
 
 function LoginContent() {
   const router = useRouter();
@@ -62,7 +63,7 @@ function LoginContent() {
     <div className="space-y-6">
       <div className="text-center">
         <Link href="/" className="inline-flex items-center gap-2">
-          <img src="/logo-wordmark.svg" alt="Meti" className="h-10 w-auto mx-auto" />
+          <Logo className="h-10 w-auto" />
         </Link>
       </div>
 

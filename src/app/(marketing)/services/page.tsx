@@ -115,7 +115,7 @@ export default function ServicesPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                className="w-full h-14 pl-12 pr-4 bg-white rounded-xl text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full h-14 pl-12 pr-4 bg-[var(--surface)] rounded-xl text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <Button
                 className="absolute right-2 bottom-2"

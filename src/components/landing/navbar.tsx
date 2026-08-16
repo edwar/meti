@@ -5,8 +5,10 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
+import { Logo } from "@/components/ui/logo";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -53,7 +55,7 @@ export function Navbar() {
     >
       <div className="container-meti flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <img src="/logo-wordmark.svg" alt="Meti" className="h-9 w-auto" />
+          <Logo className="h-10 w-auto" />
         </Link>
 
         {/* Desktop Navigation */}
@@ -73,6 +75,7 @@ export function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle />
           {user ? (
             <>
               <Button variant="secondary" size="sm" asChild>
