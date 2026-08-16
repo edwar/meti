@@ -33,14 +33,37 @@ export default function ProfilePage() {
   const [documents, setDocuments] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [documentType, setDocumentType] = useState("CERTIFICATE");
+  const [categories, setCategories] = useState<any[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (data?.profile) {
       setBio(data.profile.bio || "");
       setVideoUrl(data.profile.videoUrl || "");
+      setSelectedCategoryIds((data.profile.categories || []).map((c: any) => c.id));
       fetchDocuments();
+      fetchCategories();
     }
   }, [data]);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch("/api/categories", { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        setCategories(data.categories || []);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const toggleCategory = (id: string) => {
+    setSelectedCategoryIds((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
+    setHasChanges(true);
+  };
 
   const fetchDocuments = async () => {
     try {
@@ -87,7 +110,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     updateProfile.mutate(
-      { bio, videoUrl: videoUrl || undefined },
+      { bio, videoUrl: videoUrl || undefined, categoryIds: selectedCategoryIds },
       {
         onSuccess: () => {
           setHasChanges(false);
@@ -332,6 +355,48 @@ export default function ProfilePage() {
                   }}
                   placeholder="Ej: Soy un profesional con X años de experiencia..."
                 />
+              </CardContent>
+            </Card>
+
+            {/* Rubros */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-[var(--accent)]" />
+                  Rubros de experticia
+                </CardTitle>
+                <CardDescription>
+                  Selecciona las áreas en las que ofreces asesorías
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {categories.length === 0 ? (
+                  <p className="text-sm text-[var(--text-muted)]">Cargando rubros...</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((cat) => {
+                      const isSelected = selectedCategoryIds.includes(cat.id);
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => toggleCategory(cat.id)}
+                          className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                            isSelected
+                              ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]"
+                              : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[var(--primary)]/50"
+                          }`}
+                        >
+                          {cat.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                {selectedCategoryIds.length === 0 && (
+                  <p className="text-xs text-[var(--warning)] mt-3">
+                    Selecciona al menos un rubro para que los clientes te encuentren por área.
+                  </p>
+                )}
               </CardContent>
             </Card>
 

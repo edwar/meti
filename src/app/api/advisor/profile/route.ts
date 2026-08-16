@@ -80,7 +80,7 @@ export async function GET() {
   }
 }
 
-// PUT: Update profile
+// PUT: Update profile (incluyendo categorías)
 export async function PUT(request: NextRequest) {
   try {
     const headersList = await headers();
@@ -103,7 +103,8 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const validatedData = profileSchema.parse(body);
 
-    const updatedProfile = await prisma.advisorProfile.update({
+    // Actualizar perfil
+    await prisma.advisorProfile.update({
       where: { id: advisorProfile.id },
       data: {
         bio: validatedData.bio || null,
@@ -112,7 +113,36 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ profile: updatedProfile });
+    // Actualizar categorías si se enviaron
+    if (body.categoryIds && Array.isArray(body.categoryIds)) {
+      // Eliminar actuales y recrear
+      await prisma.advisorCategory.deleteMany({
+        where: { advisorId: advisorProfile.id },
+      });
+      if (body.categoryIds.length > 0) {
+        await prisma.advisorCategory.createMany({
+          data: body.categoryIds.map((categoryId: string) => ({
+            advisorId: advisorProfile.id,
+            categoryId,
+          })),
+        });
+      }
+    }
+
+    // Retornar perfil actualizado con categorías
+    const updated = await prisma.advisorProfile.findUnique({
+      where: { id: advisorProfile.id },
+      include: {
+        categories: { include: { category: true } },
+      },
+    });
+
+    return NextResponse.json({
+      profile: {
+        ...updated,
+        categories: updated?.categories.map((ac: { category: unknown }) => ac.category) || [],
+      },
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
