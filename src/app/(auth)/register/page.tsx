@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Logo } from "@/components/ui/logo";
 
@@ -116,14 +117,13 @@ export default function RegisterPage() {
               required
               className="w-full h-11 px-3 border border-[var(--border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)]"
             />
-            <input
-              type="password"
+            <PasswordInput
               placeholder="Contraseña (mínimo 8 caracteres)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full h-11 px-3 border border-[var(--border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)]"
+              className="h-11"
             />
             <Button type="submit" className="w-full h-11" disabled={isLoading}>
               {isLoading ? "Creando cuenta..." : "Crear cuenta"}

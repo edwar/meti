@@ -5,6 +5,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { LoadingPage } from "@/components/ui/loading";
 import { Logo } from "@/components/ui/logo";
@@ -113,13 +114,12 @@ function LoginContent() {
               required
               className="w-full h-11 px-3 border border-[var(--border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)]"
             />
-            <input
-              type="password"
+            <PasswordInput
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full h-11 px-3 border border-[var(--border)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)]"
+              className="h-11"
             />
             <Button type="submit" className="w-full h-11" disabled={isLoading}>
               {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}

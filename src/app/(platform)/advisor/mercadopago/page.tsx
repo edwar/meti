@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Badge } from "@/components/ui/badge";
 import { LoadingPage } from "@/components/ui/loading";
 import { AlertDialog } from "@/components/ui/alert-dialog";
@@ -234,8 +235,7 @@ export default function MercadoPagoPage() {
                   <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
                     Access Token
                   </label>
-                  <Input
-                    type="password"
+                  <PasswordInput
                     value={accessToken}
                     onChange={(e) => {
                       setAccessToken(e.target.value);

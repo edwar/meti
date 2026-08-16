@@ -14,7 +14,6 @@ import {
   LogOut,
   Menu,
   X,
-  Bell,
   Shield,
   CheckCircle,
 } from "lucide-react";
@@ -150,7 +149,7 @@ export default function AdminLayout({
           {/* Navigation */}
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
-              const isActive = pathname === item.href || 
+              const isActive = pathname === item.href ||
                 (item.href !== "/admin" && pathname.startsWith(item.href));
               return (
                 <Link
@@ -227,10 +226,6 @@ export default function AdminLayout({
 
             <div className="flex items-center gap-4">
               <ThemeToggle />
-              <button className="relative p-2 text-[var(--text-muted)] hover:text-[var(--text-primary)]">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[var(--error)] rounded-full" />
-              </button>
             </div>
           </div>
         </header>

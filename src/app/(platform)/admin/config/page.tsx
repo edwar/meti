@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Badge } from "@/components/ui/badge";
 import { LoadingPage } from "@/components/ui/loading";
 import { AlertDialog } from "@/components/ui/alert-dialog";
@@ -259,19 +260,7 @@ export default function ConfigPage() {
                         Precio mínimo
                       </label>
                       <div className="flex items-center gap-2">
-                        <Input
-                          type="number"
-                          value={Math.round(category.minimumPriceCents / 100)}
-                          onChange={(e) =>
-                            handleUpdateCategory(
-                              category.id,
-                              "minimumPriceCents",
-                              Number(e.target.value) * 100
-                            )
-                          }
-                          className="w-32"
-                          min={100}
-                        />
+                        <CurrencyInput value={Math.round(category.minimumPriceCents / 100)} onChange={(v) => handleUpdateCategory(category.id, "minimumPriceCents", v * 100)} className="w-40" min={100} />
                         <span className="text-sm text-[var(--text-muted)]">pesos</span>
                       </div>
                       <p className="text-xs text-[var(--text-muted)] mt-1">
@@ -375,12 +364,7 @@ export default function ConfigPage() {
                     <label className="block text-sm font-medium mb-1.5">
                       Precio mínimo ($)
                     </label>
-                    <Input
-                      type="number"
-                      value={newMinPrice}
-                      onChange={(e) => setNewMinPrice(Number(e.target.value))}
-                      min={100}
-                    />
+                    <CurrencyInput value={newMinPrice} onChange={setNewMinPrice} min={100} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1.5">

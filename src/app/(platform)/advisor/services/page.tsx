@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingPage } from "@/components/ui/loading";
@@ -346,10 +347,9 @@ function ServiceModal({
                 <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
                   Tu ganancia ($) *
                 </label>
-                <Input
-                  type="number"
+                <CurrencyInput
                   value={price}
-                  onChange={(e) => setPrice(Number(e.target.value))}
+                  onChange={setPrice}
                   min={100}
                   required
                 />
