@@ -74,6 +74,7 @@ export default function CallPage({
             appointmentId={appointmentId}
             userRole={userRole as "advisor" | "client"}
             userName={user.name}
+            userId={user.id}
           />
         ) : (
           <WaitingRoom

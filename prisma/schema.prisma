@@ -367,6 +367,7 @@ model Appointment {
   // LiveKit
   liveKitRoomId   String?
   recordingUrl    String?
+  recordingEgressId String?          // Egress activo de LiveKit (grabación en curso)
 
   // Cancellation
   cancelReason    String?
@@ -383,6 +384,7 @@ model Appointment {
   advisor         AdvisorProfile    @relation(fields: [advisorId], references: [id])
   service         AdvisorService    @relation(fields: [serviceId], references: [id])
   review          Review?
+  chatMessages    ChatMessage[]
 
   @@map("appointments")
 }
@@ -410,6 +412,25 @@ model Review {
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
+}
+
+// ============================================
+// CHAT PERSISTENTE (videollamada)
+// ============================================
+
+model ChatMessage {
+  id            String   @id @default(cuid())
+  appointmentId String
+  senderId      String
+  senderName    String
+  senderRole    String   // "advisor" | "client"
+  body          String   @db.Text
+  createdAt     DateTime @default(now())
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([appointmentId, createdAt])
+  @@map("chat_messages")
 }
 
 // ============================================
