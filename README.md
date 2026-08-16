@@ -286,7 +286,7 @@ Estado actual: **MVP en desarrollo**.
 - [x] Notificaciones (Sileo): recordatorios y alertas de booking
 - [x] Promociones por fechas especiales
 - [x] Facturación mensual automática para asesores
-- [ ] Modo oscuro
+- [x] Modo oscuro
 - [ ] Grabación y chat persistente en videollamadas
 
 ## 📄 Licencia
