@@ -36,7 +36,7 @@ export function CurrencyInput({
       inputMode="numeric"
       value={formatCOP(value)}
       onChange={handleChange}
-      className={cn("text-right", className)}
+      className={cn(className)}
       {...props}
     />
   );
