@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Logo } from "@/components/ui/logo";
+import { LoadingPage } from "@/components/ui/loading";
 
 const navigation = [
   {
@@ -101,11 +102,7 @@ export default function AdvisorLayout({
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <LoadingPage fullScreen label="Verificando tu sesión" />;
   }
 
   if (!user) {

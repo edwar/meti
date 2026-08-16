@@ -113,6 +113,7 @@ model AdvisorProfile {
   speciality      String?  // Deprecated: use categories instead
   videoUrl        String?  // Video de presentación
   isActive        Boolean  @default(true)
+  isHidden        Boolean  @default(false) // Asesor se oculta del listado público
   
   // Verification fields
   isVerified      Boolean  @default(false)

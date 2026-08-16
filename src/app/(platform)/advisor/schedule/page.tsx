@@ -315,7 +315,7 @@ export default function SchedulePage() {
 
   const dayHours = Array.from({ length: 15 }, (_, i) => i + 7);
 
-  if (isLoading) return <LoadingPage />;
+  if (isLoading) return <LoadingPage label="Cargando tu agenda" />;
 
   return (
     <>

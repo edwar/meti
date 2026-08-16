@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { LoadingPage } from "@/components/ui/loading";
+import { RedirectLoading } from "@/components/ui/redirect-loading";
 import { useCheckoutStore } from "@/lib/checkout-store";
 
 export default function RedirectPage() {
@@ -83,5 +83,5 @@ export default function RedirectPage() {
     handleRedirect();
   }, [router, setCheckingOut]);
 
-  return <LoadingPage fullScreen />;
+  return <RedirectLoading />;
 }

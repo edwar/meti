@@ -9,6 +9,7 @@ const profileSchema = z.object({
   speciality: z.string().optional(),
   videoUrl: z.string().url().optional().or(z.literal("")),
   bookingLeadHours: z.number().int().min(0).max(168).optional(),
+  isHidden: z.boolean().optional(),
 });
 
 // GET: Get profile
@@ -61,6 +62,7 @@ export async function GET() {
         speciality: advisorProfile.speciality,
         videoUrl: advisorProfile.videoUrl,
         isActive: advisorProfile.isActive,
+        isHidden: advisorProfile.isHidden,
         isVerified: advisorProfile.isVerified,
         verificationStatus: advisorProfile.verificationStatus,
         createdAt: advisorProfile.createdAt,
@@ -108,11 +110,18 @@ export async function PUT(request: NextRequest) {
     await prisma.advisorProfile.update({
       where: { id: advisorProfile.id },
       data: {
-        bio: validatedData.bio || null,
-        speciality: validatedData.speciality || null,
-        videoUrl: validatedData.videoUrl || null,
+        ...(validatedData.bio !== undefined ? { bio: validatedData.bio || null } : {}),
+        ...(validatedData.speciality !== undefined
+          ? { speciality: validatedData.speciality || null }
+          : {}),
+        ...(validatedData.videoUrl !== undefined
+          ? { videoUrl: validatedData.videoUrl || null }
+          : {}),
         ...(validatedData.bookingLeadHours !== undefined
           ? { bookingLeadHours: validatedData.bookingLeadHours }
+          : {}),
+        ...(validatedData.isHidden !== undefined
+          ? { isHidden: validatedData.isHidden }
           : {}),
       },
     });

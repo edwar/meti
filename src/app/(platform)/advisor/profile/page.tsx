@@ -20,8 +20,11 @@ import {
   Upload,
   CheckCircle,
   Clock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import "lite-youtube-embed/src/lite-yt-embed.css";
+import { sileo } from "sileo";
 
 export default function ProfilePage() {
   const dialog = useDialog();
@@ -37,12 +40,14 @@ export default function ProfilePage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [bookingLeadHours, setBookingLeadHours] = useState(24);
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
     if (data?.profile) {
       setBio(data.profile.bio || "");
       setVideoUrl(data.profile.videoUrl || "");
       setBookingLeadHours(data.profile.bookingLeadHours || 24);
+      setIsHidden(data.profile.isHidden || false);
       setSelectedCategoryIds((data.profile.categories || []).map((c: any) => c.id));
       fetchDocuments();
       fetchCategories();
@@ -121,6 +126,28 @@ export default function ProfilePage() {
         },
         onError: () => {
           dialog.showAlert("Error", "Error al actualizar perfil", "error");
+        },
+      }
+    );
+  };
+
+  const handleToggleVisibility = () => {
+    const next = !isHidden;
+    setIsHidden(next);
+    updateProfile.mutate(
+      { isHidden: next },
+      {
+        onSuccess: () => {
+          sileo.success({
+            title: next ? "Perfil oculto" : "Perfil visible",
+            description: next
+              ? "Ya no apareces en la lista pública de asesores."
+              : "Tu perfil vuelve a aparecer en la lista pública de asesores.",
+          });
+        },
+        onError: () => {
+          setIsHidden(!next);
+          sileo.error({ title: "Error", description: "No se pudo actualizar la visibilidad. Intenta de nuevo." });
         },
       }
     );
@@ -291,6 +318,47 @@ export default function ProfilePage() {
                   Ejemplo: si defines 6, los clientes no podrán reservar para las próximas 6 horas.
                   Con 0, pueden agendar cualquier horario disponible del día.
                 </p>
+              </CardContent>
+            </Card>
+
+            {/* Visibilidad */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  {isHidden ? (
+                    <EyeOff className="w-5 h-5 text-[var(--text-muted)]" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-[var(--primary)]" />
+                  )}
+                  Visibilidad en el directorio
+                </CardTitle>
+                <CardDescription>
+                  Controla si tu perfil aparece en la lista pública de asesores
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
+                      {isHidden ? "Oculto del listado público" : "Visible en el listado público"}
+                    </p>
+                    <p className="text-xs text-[var(--text-muted)] mt-1">
+                      Al ocultarte, sigues activo y puedes atender tus citas, pero los
+                      clientes no podrán encontrarte en el directorio.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleToggleVisibility}
+                    disabled={updateProfile.isPending}
+                    aria-label="Cambiar visibilidad del perfil"
+                    className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 disabled:opacity-50 ${isHidden ? "bg-[var(--error)]" : "bg-[var(--success)]"}`}
+                  >
+                    <span
+                      className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${isHidden ? "left-6" : "left-0.5"}`}
+                    />
+                  </button>
+                </div>
               </CardContent>
             </Card>
           </div>

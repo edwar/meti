@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Logo } from "@/components/ui/logo";
+import { LoadingPage } from "@/components/ui/loading";
 
 const navigation = [
   {

@@ -291,6 +291,7 @@ function ServiceModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
+      id: service?.id,
       name,
       description: description || undefined,
       durationMin: duration,

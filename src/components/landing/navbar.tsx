@@ -58,23 +58,19 @@ export function Navbar() {
           <Logo className="h-10 w-auto" />
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          <Link
-            href="/services"
-            className={cn(
-              "text-sm font-medium transition-colors duration-200",
-              isServicesActive
-                ? "text-[var(--primary)] font-semibold"
-                : "text-[var(--text-secondary)] hover:text-[var(--primary)]"
-            )}
-          >
-            Explorar asesores
-          </Link>
-        </nav>
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-8">
+            <Button variant={isServicesActive ? "default" : "ghost"} size="sm" asChild>
+              <Link
+                href="/services"
+              >
+                Explorar asesores
+              </Link>
+            </Button>
+          </nav>
           <ThemeToggle />
           {user ? (
             <>
