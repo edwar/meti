@@ -290,6 +290,9 @@ export default function SchedulePage() {
     } else if (viewMode === "week") {
       const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
       return eachDayOfInterval({ start: weekStart, end: addDays(weekStart, 6) });
+    } else if (viewMode === "agenda") {
+      const agendaStart = startOfWeek(currentDate, { weekStartsOn: 0 });
+      return eachDayOfInterval({ start: agendaStart, end: addWeeks(agendaStart, 2) });
     } else {
       return [currentDate];
     }
@@ -616,48 +619,54 @@ export default function SchedulePage() {
             {viewMode === "agenda" && (
               <Card className="overflow-hidden">
                 <CardContent className="p-0 divide-y divide-[var(--border)]">
-                  {getItemsForDay(new Date()).appointments.length === 0 && getItemsForDay(new Date()).blocked.length === 0 ? (
-                    <div className="p-8">
-                      <EmptyState icon={Calendar} title="Sin eventos" description="No hay citas ni bloqueos en este período." />
-                    </div>
-                  ) : (
-                    calendarDays.map((day) => {
+                  {(() => {
+                    const hasEvents = calendarDays.some((day) => {
                       const { blocked, appointments: apts } = getItemsForDay(day);
-                      if (blocked.length === 0 && apts.length === 0) return null;
+                      return blocked.length > 0 || apts.length > 0;
+                    });
+                    return !hasEvents ? (
+                      <div className="p-8">
+                        <EmptyState icon={Calendar} title="Sin eventos" description="No hay citas ni bloqueos en este período." />
+                      </div>
+                    ) : (
+                      calendarDays.map((day) => {
+                        const { blocked, appointments: apts } = getItemsForDay(day);
+                        if (blocked.length === 0 && apts.length === 0) return null;
 
-                      return (
-                        <div key={day.toISOString()}>
-                          <div className="px-4 py-2 bg-[var(--background)] border-b border-[var(--border)]">
-                            <div className="text-sm font-semibold text-[var(--text-primary)]">{format(day, "d 'de' MMMM", { locale: es }).toUpperCase()}</div>
-                            <div className="text-xs text-[var(--text-muted)]">{format(day, "EEEE", { locale: es })}</div>
-                          </div>
+                        return (
+                          <div key={day.toISOString()}>
+                            <div className="px-4 py-2 bg-[var(--background)] border-b border-[var(--border)]">
+                              <div className="text-sm font-semibold text-[var(--text-primary)]">{format(day, "d 'de' MMMM", { locale: es }).toUpperCase()}</div>
+                              <div className="text-xs text-[var(--text-muted)]">{format(day, "EEEE", { locale: es })}</div>
+                            </div>
 
-                          <div className="divide-y divide-[var(--border)]">
-                            {blocked.map((bt) => (
-                              <div key={bt.id} className="px-4 py-3 bg-[var(--error-light)] border-l-4 border-[var(--error)]">
-                                <div className="font-medium text-[var(--text-primary)]">{bt.title}</div>
-                                <div className="text-sm text-[var(--text-muted)]">{bt.isAllDay ? "Todo el día" : `${format(new Date(bt.startDate), "HH:mm")} - ${format(new Date(bt.endDate), "HH:mm")}`}</div>
-                              </div>
-                            ))}
-
-                            {apts.map((apt) => (
-                              <div key={apt.id} className={cn("px-4 py-3 border-l-4", apt.status === "CONFIRMED" && "bg-[var(--primary-light)] border-[var(--primary)]", apt.status === "PENDING" && "bg-[var(--warning-light)] border-[var(--warning)]", apt.status === "COMPLETED" && "bg-[var(--success-light)] border-[var(--success)]")}>
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <div className="font-medium text-[var(--text-primary)]">{apt.client.name}</div>
-                                    <div className="text-sm text-[var(--text-muted)]">{apt.service.name} • {format(new Date(apt.scheduledAt), "HH:mm")} - {format(new Date(new Date(apt.scheduledAt).getTime() + apt.durationMin * 60000), "HH:mm")}</div>
-                                  </div>
-                                  <Badge variant={apt.status === "CONFIRMED" ? "default" : apt.status === "PENDING" ? "warning" : "success"}>
-                                    {apt.status === "CONFIRMED" ? "Confirmada" : apt.status === "PENDING" ? "Pendiente" : "Completada"}
-                                  </Badge>
+                            <div className="divide-y divide-[var(--border)]">
+                              {blocked.map((bt) => (
+                                <div key={bt.id} className="px-4 py-3 bg-[var(--error-light)] border-l-4 border-[var(--error)]">
+                                  <div className="font-medium text-[var(--text-primary)]">{bt.title}</div>
+                                  <div className="text-sm text-[var(--text-muted)]">{bt.isAllDay ? "Todo el día" : `${format(new Date(bt.startDate), "HH:mm")} - ${format(new Date(bt.endDate), "HH:mm")}`}</div>
                                 </div>
-                              </div>
-                            ))}
+                              ))}
+
+                              {apts.map((apt) => (
+                                <div key={apt.id} className={cn("px-4 py-3 border-l-4", apt.status === "CONFIRMED" && "bg-[var(--primary-light)] border-[var(--primary)]", apt.status === "PENDING" && "bg-[var(--warning-light)] border-[var(--warning)]", apt.status === "COMPLETED" && "bg-[var(--success-light)] border-[var(--success)]")}>
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <div className="font-medium text-[var(--text-primary)]">{apt.client.name}</div>
+                                      <div className="text-sm text-[var(--text-muted)]">{apt.service.name} • {format(new Date(apt.scheduledAt), "HH:mm")} - {format(new Date(new Date(apt.scheduledAt).getTime() + apt.durationMin * 60000), "HH:mm")}</div>
+                                    </div>
+                                    <Badge variant={apt.status === "CONFIRMED" ? "default" : apt.status === "PENDING" ? "warning" : "success"}>
+                                      {apt.status === "CONFIRMED" ? "Confirmada" : apt.status === "PENDING" ? "Pendiente" : "Completada"}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })
-                  )}
+                        );
+                      })
+                    );
+                  })()}
                 </CardContent>
               </Card>
             )}
