@@ -36,7 +36,7 @@ export default function ProfilePage() {
   const [documentType, setDocumentType] = useState("CERTIFICATE");
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
-  const [bookingLeadHours, setBookingLeadHours] = useState(0);
+  const [bookingLeadHours, setBookingLeadHours] = useState(24);
 
   useEffect(() => {
     if (data?.profile) {
@@ -160,7 +160,7 @@ export default function ProfilePage() {
 
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column - Profile Info & Documents */}
+          {/* Left Column - Identidad, Bio, Stats y Agendado */}
           <div className="space-y-6">
             {/* Profile Card */}
             <Card>
@@ -206,6 +206,138 @@ export default function ProfilePage() {
                     )}
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Bio */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Pencil className="w-5 h-5" />
+                  Biografía
+                </CardTitle>
+                <CardDescription>
+                  Cuéntale a los clientes sobre tu experiencia
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <textarea
+                  className="w-full h-40 px-4 py-3 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 resize-none"
+                  value={bio}
+                  onChange={(e) => {
+                    setBio(e.target.value);
+                    setHasChanges(true);
+                  }}
+                  placeholder="Ej: Soy un profesional con X años de experiencia..."
+                />
+              </CardContent>
+            </Card>
+
+            {/* Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Estadísticas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="p-4 rounded-lg bg-[var(--background)]">
+                    <div className="text-2xl font-heading font-bold text-[var(--primary)]">
+                      {stats?.reviewCount || 0}
+                    </div>
+                    <div className="text-xs text-[var(--text-muted)]">Reseñas</div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-[var(--background)]">
+                    <div className="text-2xl font-heading font-bold text-[var(--accent)]">
+                      {stats?.rating || 0}
+                    </div>
+                    <div className="text-xs text-[var(--text-muted)]">Rating</div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-[var(--background)]">
+                    <div className="text-2xl font-heading font-bold text-[var(--success)]">
+                      {profile.categories?.length || 0}
+                    </div>
+                    <div className="text-xs text-[var(--text-muted)]">Rubros</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Anticipación mínima */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="w-5 h-5 text-[var(--primary)]" />
+                Configuración de agendado
+              </CardTitle>
+              <CardDescription>
+                Define con cuánta anticipación mínima los clientes pueden reservar
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  min={0}
+                  max={168}
+                  value={bookingLeadHours}
+                  onChange={(e) => {
+                    setBookingLeadHours(Math.max(0, Number(e.target.value)));
+                    setHasChanges(true);
+                  }}
+                  className="w-24 text-center"
+                />
+                <span className="text-sm text-[var(--text-muted)]">horas de anticipación</span>
+              </div>
+              <p className="text-xs text-[var(--text-muted)] mt-3">
+                Ejemplo: si defines 6, los clientes no podrán reservar para las próximas 6 horas.
+                Con 0, pueden agendar cualquier horario disponible del día.
+              </p>
+            </CardContent>
+          </Card>
+
+
+
+          {/* Right Column - Rubros, Documentos y Video */}
+          <div className="space-y-6">
+            {/* Rubros */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-[var(--accent)]" />
+                  Rubros de experticia
+                </CardTitle>
+                <CardDescription>
+                  Selecciona las áreas en las que ofreces asesorías
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {categories.length === 0 ? (
+                  <p className="text-sm text-[var(--text-muted)]">Cargando rubros...</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((cat) => {
+                      const isSelected = selectedCategoryIds.includes(cat.id);
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => toggleCategory(cat.id)}
+                          className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${isSelected
+                              ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]"
+                              : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[var(--primary)]/50"
+                            }`}
+                        >
+                          {cat.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                {selectedCategoryIds.length === 0 && (
+                  <p className="text-xs text-[var(--warning)] mt-3">
+                    Selecciona al menos un rubro para que los clientes te encuentren por área.
+                  </p>
+                )}
               </CardContent>
             </Card>
 
@@ -284,19 +416,19 @@ export default function ProfilePage() {
                             doc.manualStatus === "APPROVED"
                               ? "success"
                               : doc.manualStatus === "REJECTED"
-                              ? "destructive"
-                              : doc.aiStatus === "COMPLETED"
-                              ? "warning"
-                              : "outline"
+                                ? "destructive"
+                                : doc.aiStatus === "COMPLETED"
+                                  ? "warning"
+                                  : "outline"
                           }
                         >
                           {doc.manualStatus === "APPROVED"
                             ? "Aprobado"
                             : doc.manualStatus === "REJECTED"
-                            ? "Rechazado"
-                            : doc.aiStatus === "COMPLETED"
-                            ? "Pendiente"
-                            : "Analizando"}
+                              ? "Rechazado"
+                              : doc.aiStatus === "COMPLETED"
+                                ? "Pendiente"
+                                : "Analizando"}
                         </Badge>
                       </div>
                     ))}
@@ -305,138 +437,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Estadísticas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="p-4 rounded-lg bg-[var(--background)]">
-                    <div className="text-2xl font-heading font-bold text-[var(--primary)]">
-                      {stats?.reviewCount || 0}
-                    </div>
-                    <div className="text-xs text-[var(--text-muted)]">Reseñas</div>
-                  </div>
-                  <div className="p-4 rounded-lg bg-[var(--background)]">
-                    <div className="text-2xl font-heading font-bold text-[var(--accent)]">
-                      {stats?.rating || 0}
-                    </div>
-                    <div className="text-xs text-[var(--text-muted)]">Rating</div>
-                  </div>
-                  <div className="p-4 rounded-lg bg-[var(--background)]">
-                    <div className="text-2xl font-heading font-bold text-[var(--success)]">
-                      {profile.categories?.length || 0}
-                    </div>
-                    <div className="text-xs text-[var(--text-muted)]">Rubros</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Anticipación mínima */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-[var(--primary)]" />
-                  Configuración de agendado
-                </CardTitle>
-                <CardDescription>
-                  Define con cuánta anticipación mínima los clientes pueden reservar
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-3">
-                  <Input
-                    type="number"
-                    min={0}
-                    max={168}
-                    value={bookingLeadHours}
-                    onChange={(e) => {
-                      setBookingLeadHours(Math.max(0, Number(e.target.value)));
-                      setHasChanges(true);
-                    }}
-                    className="w-24 text-center"
-                  />
-                  <span className="text-sm text-[var(--text-muted)]">horas de anticipación</span>
-                </div>
-                <p className="text-xs text-[var(--text-muted)] mt-3">
-                  Ejemplo: si defines 6, los clientes no podrán reservar para las próximas 6 horas.
-                  Con 0, pueden agendar cualquier horario disponible del día.
-                </p>
-              </CardContent>
-            </Card>
-
             
-
-            {/* Right Column - Bio & Video */}
-          <div className="space-y-6">
-            {/* Bio */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Pencil className="w-5 h-5" />
-                  Biografía
-                </CardTitle>
-                <CardDescription>
-                  Cuéntale a los clientes sobre tu experiencia
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <textarea
-                  className="w-full h-40 px-4 py-3 text-sm border border-[var(--border)] rounded-lg focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 resize-none"
-                  value={bio}
-                  onChange={(e) => {
-                    setBio(e.target.value);
-                    setHasChanges(true);
-                  }}
-                  placeholder="Ej: Soy un profesional con X años de experiencia..."
-                />
-              </CardContent>
-            </Card>
-
-            {/* Rubros */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-[var(--accent)]" />
-                  Rubros de experticia
-                </CardTitle>
-                <CardDescription>
-                  Selecciona las áreas en las que ofreces asesorías
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {categories.length === 0 ? (
-                  <p className="text-sm text-[var(--text-muted)]">Cargando rubros...</p>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((cat) => {
-                      const isSelected = selectedCategoryIds.includes(cat.id);
-                      return (
-                        <button
-                          key={cat.id}
-                          onClick={() => toggleCategory(cat.id)}
-                          className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
-                            isSelected
-                              ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]"
-                              : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[var(--primary)]/50"
-                          }`}
-                        >
-                          {cat.name}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-                {selectedCategoryIds.length === 0 && (
-                  <p className="text-xs text-[var(--warning)] mt-3">
-                    Selecciona al menos un rubro para que los clientes te encuentren por área.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
 
             {/* Video */}
             <Card>
