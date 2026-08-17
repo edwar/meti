@@ -369,7 +369,12 @@ function ServiceModal({
               <Input
                 type="number"
                 value={rescheduleHours}
-                onChange={(e) => setRescheduleHours(Number(e.target.value))}
+                onChange={(e) => {
+                  setRescheduleHours(e.target.value === "" ? 0 : Math.max(0, Number(e.target.value)));
+                }}
+                onBlur={(e) => {
+                  setRescheduleHours(Math.max(0, Number(e.target.value)));
+                }}
                 min={0}
                 max={168}
               />

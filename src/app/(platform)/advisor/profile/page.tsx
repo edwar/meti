@@ -307,8 +307,11 @@ export default function ProfilePage() {
                     max={168}
                     value={bookingLeadHours}
                     onChange={(e) => {
-                      setBookingLeadHours(Math.max(0, Number(e.target.value)));
+                      setBookingLeadHours(e.target.value === "" ? 0 : Math.max(0, Number(e.target.value)));
                       setHasChanges(true);
+                    }}
+                    onBlur={(e) => {
+                      setBookingLeadHours(Math.max(0, Number(e.target.value)));
                     }}
                     className="w-24 text-center"
                   />
