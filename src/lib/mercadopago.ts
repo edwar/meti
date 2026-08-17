@@ -44,7 +44,6 @@ export async function createCheckoutPreference({
         currency_id: "COP",
       })),
       external_reference: externalReference,
-      notification_url: `${appUrl}/api/webhooks/mercadopago`,
       back_urls: {
         success: `${appUrl}/checkout/result?appointmentId=${externalReference}&status=approved`,
         pending: `${appUrl}/checkout/result?appointmentId=${externalReference}&status=pending`,
