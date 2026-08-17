@@ -307,8 +307,29 @@ export default function ProfilePage() {
                     max={168}
                     value={bookingLeadHours}
                     onChange={(e) => {
-                      setBookingLeadHours(Math.max(0, Number(e.target.value)));
+                      const raw = e.target.value;
+                      if (raw === "") {
+                        setBookingLeadHours(0);
+                      } else {
+                        setBookingLeadHours(Math.max(0, Number(raw)));
+                      }
                       setHasChanges(true);
+                    }}
+                    onKeyDown={(e) => {
+                      const input = e.target as HTMLInputElement;
+                      const isDigit = e.key >= "0" && e.key <= "9";
+                      const isControl = e.key === "Backspace" || e.key === "Delete";
+                      if ((isDigit || isControl) && input.value === "0") {
+                        e.preventDefault();
+                        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                          window.HTMLInputElement.prototype, "value"
+                        )?.set;
+                        nativeInputValueSetter?.call(input, isDigit ? e.key : "");
+                        input.dispatchEvent(new Event("input", { bubbles: true }));
+                      }
+                    }}
+                    onBlur={(e) => {
+                      setBookingLeadHours(Math.max(0, Number(e.target.value)));
                     }}
                     className="w-24 text-center"
                   />
