@@ -12,6 +12,7 @@ export async function GET(
     const advisor = await prisma.advisorProfile.findUnique({
       where: { id },
       select: {
+        mpMode: true,
         mpPublicKey: true,
         mpAccessToken: true,
       },
@@ -23,7 +24,7 @@ export async function GET(
 
     const isConnected = !!(advisor.mpPublicKey && advisor.mpAccessToken);
 
-    return NextResponse.json({ isConnected });
+    return NextResponse.json({ isConnected, mpMode: advisor.mpMode });
   } catch (error) {
     console.error("Error checking MP status:", error);
     return NextResponse.json(

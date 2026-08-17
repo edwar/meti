@@ -36,6 +36,7 @@ interface Advisor {
   bio: string | null;
   videoUrl: string | null;
   isVerified: boolean;
+  mpMode: string;
   bookingLeadHours: number;
   rating: number;
   reviewCount: number;
@@ -242,7 +243,13 @@ export default function AdvisorProfilePage({ params }: { params: Promise<{ id: s
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left column - Advisor info */}
             <div className="lg:col-span-1 space-y-6">
-              <Card>
+              <Card className="relative overflow-hidden">
+                {/* Test mode ribbon */}
+                {advisor.mpMode === "TEST" && (
+                  <div className="absolute top-3.5 -right-8 z-10 rotate-45 bg-[var(--warning)] text-white text-[10px] font-bold px-8 py-0.5 shadow-md pointer-events-none">
+                    PRUEBA
+                  </div>
+                )}
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     {advisor.image ? (

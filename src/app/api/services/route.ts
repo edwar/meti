@@ -91,6 +91,7 @@ export async function GET(request: NextRequest) {
         speciality: advisor.speciality,
         bio: advisor.bio,
         isVerified: advisor.isVerified,
+        mpMode: advisor.mpMode,
         rating: Math.round(avgRating * 10) / 10,
         reviewCount: reviewData.count,
         minPrice: advisor.services[0]?.priceCents || 0,

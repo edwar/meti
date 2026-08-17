@@ -18,6 +18,7 @@ import {
   ArrowLeft,
   AlertTriangle,
   LogIn,
+  TestTube,
 } from "lucide-react";
 
 function formatCurrency(cents: number) {
@@ -34,6 +35,7 @@ function CheckoutContent() {
   const dialog = useDialog();
   const [isProcessing, setIsProcessing] = useState(false);
   const [advisorHasMP, setAdvisorHasMP] = useState<boolean | null>(null);
+  const [advisorMpMode, setAdvisorMpMode] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [promotion, setPromotion] = useState<any>(null);
 
@@ -97,6 +99,7 @@ function CheckoutContent() {
       if (res.ok) {
         const data = await res.json();
         setAdvisorHasMP(data.isConnected);
+        setAdvisorMpMode(data.mpMode || null);
       } else {
         setAdvisorHasMP(false);
       }
@@ -230,6 +233,25 @@ function CheckoutContent() {
                       <Button onClick={handleLogin} size="lg">
                         Iniciar sesión
                       </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Test mode banner */}
+              {advisorMpMode === "TEST" && (
+                <Card className="border-[var(--warning)] bg-[var(--warning-light)]">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <TestTube className="w-5 h-5 text-[var(--warning)] flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-[var(--text-primary)]">
+                          Este asesor está en modo prueba
+                        </p>
+                        <p className="text-sm text-[var(--text-muted)] mt-1">
+                          El pago no es real. Puedes probar el flujo de compra sin gastar dinero.
+                        </p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

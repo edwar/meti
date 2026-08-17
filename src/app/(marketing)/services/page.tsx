@@ -23,6 +23,7 @@ interface Advisor {
   speciality: string | null;
   bio: string | null;
   isVerified: boolean;
+  mpMode: string;
   rating: number;
   reviewCount: number;
   minPrice: number;
@@ -201,7 +202,13 @@ export default function ServicesPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {sortedAdvisors.map((advisor) => (
                   <Link key={advisor.id} href={`/advisor/${advisor.id}`}>
-                    <Card className="h-full hover:shadow-lg transition-all cursor-pointer group">
+                    <Card className="h-full hover:shadow-lg transition-all cursor-pointer group relative overflow-hidden">
+                      {/* Test mode ribbon */}
+                      {advisor.mpMode === "TEST" && (
+                        <div className="absolute top-3.5 -right-8 z-10 rotate-45 bg-[var(--warning)] text-white text-[10px] font-bold px-8 py-0.5 shadow-md pointer-events-none">
+                          PRUEBA
+                        </div>
+                      )}
                       <CardContent className="p-5">
                         {/* Header */}
                         <div className="flex items-start gap-3 mb-4">

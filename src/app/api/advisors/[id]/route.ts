@@ -65,6 +65,7 @@ export async function GET(
         bio: advisor.bio,
         videoUrl: advisor.videoUrl,
         isVerified: advisor.isVerified,
+        mpMode: advisor.mpMode,
         bookingLeadHours: advisor.bookingLeadHours,
         rating: Math.round(avgRating * 10) / 10,
         reviewCount: reviews.length,

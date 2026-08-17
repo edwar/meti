@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
 
     // Create appointment as PENDING: blocks the slot immediately and is
     // confirmed by the Mercado Pago webhook once payment is approved.
+    const isTest = advisorProfile.mpMode === "TEST";
     const appointment = await prisma.appointment.create({
       data: {
         clientId: session.user.id,
@@ -89,6 +90,7 @@ export async function POST(request: NextRequest) {
         advisorEarning,
         platformFee,
         discountCents,
+        isTest,
       },
     });
 

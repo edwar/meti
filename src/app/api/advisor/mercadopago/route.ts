@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-// GET: Get MercadoPago credentials
+// GET: Get MercadoPago credentials + mode
 export async function GET() {
   try {
     const headersList = await headers();
@@ -18,6 +18,7 @@ export async function GET() {
     const advisorProfile = await prisma.advisorProfile.findUnique({
       where: { userId: session.user.id },
       select: {
+        mpMode: true,
         mpPublicKey: true,
         mpAccessToken: true,
       },
@@ -28,6 +29,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
+      mpMode: advisorProfile.mpMode,
       publicKey: advisorProfile.mpPublicKey || null,
       accessToken: advisorProfile.mpAccessToken ? "••••••••••••••••" : null,
       isConnected: !!(advisorProfile.mpPublicKey && advisorProfile.mpAccessToken),
@@ -41,7 +43,7 @@ export async function GET() {
   }
 }
 
-// POST: Save MercadoPago credentials
+// POST: Save MercadoPago credentials or switch mode
 export async function POST(request: NextRequest) {
   try {
     const headersList = await headers();
@@ -61,7 +63,53 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Advisor profile not found" }, { status: 404 });
     }
 
-    const { publicKey, accessToken } = await request.json();
+    const body = await request.json();
+
+    // Mode switch (no credentials update)
+    if (body.mpMode && !body.publicKey && !body.accessToken) {
+      if (!["TEST", "PRODUCTION"].includes(body.mpMode)) {
+        return NextResponse.json(
+          { error: "mpMode must be TEST or PRODUCTION" },
+          { status: 400 }
+        );
+      }
+
+      // When switching to PRODUCTION: delete all test appointments
+      let deletedTestCount = 0;
+      if (body.mpMode === "PRODUCTION" && advisorProfile.mpMode === "TEST") {
+        const testAppointments = await prisma.appointment.findMany({
+          where: {
+            advisorId: advisorProfile.id,
+            isTest: true,
+          },
+          select: { id: true },
+        });
+
+        if (testAppointments.length > 0) {
+          const testIds = testAppointments.map((a: { id: string }) => a.id);
+          await prisma.appointment.deleteMany({
+            where: {
+              id: { in: testIds },
+            },
+          });
+          deletedTestCount = testAppointments.length;
+        }
+      }
+
+      await prisma.advisorProfile.update({
+        where: { id: advisorProfile.id },
+        data: { mpMode: body.mpMode },
+      });
+
+      return NextResponse.json({
+        success: true,
+        mpMode: body.mpMode,
+        deletedTestCount,
+      });
+    }
+
+    // Credentials update
+    const { publicKey, accessToken, mpMode } = body;
 
     if (!publicKey || !accessToken) {
       return NextResponse.json(
@@ -90,6 +138,7 @@ export async function POST(request: NextRequest) {
       data: {
         mpPublicKey: publicKey,
         mpAccessToken: accessToken,
+        ...(mpMode ? { mpMode } : {}),
       },
     });
 

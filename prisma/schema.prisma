@@ -127,6 +127,7 @@ model AdvisorProfile {
   updatedAt       DateTime @updatedAt
 
   // Mercado Pago credentials
+  mpMode          String   @default("PRODUCTION") // "TEST" | "PRODUCTION"
   mpPublicKey     String?
   mpAccessToken   String?  // Encrypted
 
@@ -365,6 +366,7 @@ model Appointment {
   advisorEarning  Int               // What advisor earns
   platformFee     Int               // Platform fee
   discountCents   Int  @default(0)  // Descuento aplicado (promoción)
+  isTest          Boolean @default(false) // Cita creada en modo prueba MP
   paymentId       String?           // Mercado Pago payment ID
   mpPreferenceId  String?           // Mercado Pago preference ID (Checkout Pro)
 
