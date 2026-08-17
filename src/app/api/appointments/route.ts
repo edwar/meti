@@ -111,7 +111,6 @@ export async function POST(request: NextRequest) {
             },
           ],
           externalReference: appointment.id,
-          payerEmail: session.user.email,
         });
 
       await prisma.appointment.update({

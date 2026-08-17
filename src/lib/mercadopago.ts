@@ -19,16 +19,14 @@ interface CreatePreferenceParams {
   accessToken: string;
   items: PreferenceItem[];
   externalReference: string;
-  payerEmail?: string;
 }
 
 // Crea una preferencia de Checkout Pro usando las credenciales del asesor
-// (modelo sin custodia: el pago llega directo a la cuenta MP del asesor).
+// (modelo sin custodia: el pago llega directo a la cuenta del asesor).
 export async function createCheckoutPreference({
   accessToken,
   items,
   externalReference,
-  payerEmail,
 }: CreatePreferenceParams) {
   const client = new MercadoPagoConfig({ accessToken });
   const appUrl = getAppUrl();
@@ -44,7 +42,6 @@ export async function createCheckoutPreference({
         currency_id: "COP",
       })),
       external_reference: externalReference,
-      notification_url: `${appUrl}/api/webhooks/mercadopago`,
       back_urls: {
         success: `${appUrl}/checkout/result?appointmentId=${externalReference}&status=approved`,
         pending: `${appUrl}/checkout/result?appointmentId=${externalReference}&status=pending`,
@@ -55,7 +52,9 @@ export async function createCheckoutPreference({
       metadata: {
         appointment_id: externalReference,
       },
-      ...(payerEmail ? { payer: { email: payerEmail } } : {}),
+      // payerEmail se omite: MP pide el email en su checkout.
+      // Si se envía el mismo email del vendedor, MP sandbox entra en loop
+      // porque no permite self-payments.
     },
   });
 
