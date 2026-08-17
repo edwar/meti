@@ -8,6 +8,9 @@ const TEST_DATABASE_URL = process.env.TEST_DATABASE_URL!;
 const BASE_URL = process.env.E2E_BASE_URL || "http://localhost:3100";
 const PORT = new URL(BASE_URL).port;
 
+// Secret fijo para la suite (en CI no existe .env; localmente pisa el de dev)
+const TEST_AUTH_SECRET = "meti-e2e-better-auth-secret-7f3c9a1e5b8d2046e9a1c7f3b5d9e2a4";
+
 export default defineConfig({
   testDir: "./tests/e2e",
   globalSetup: "./tests/e2e/global-setup.ts",
@@ -39,6 +42,7 @@ export default defineConfig({
       APP_URL: BASE_URL,
       NEXT_DIST_DIR: "test-results/.next-test",
       DISABLE_RATE_LIMIT: "1",
+      BETTER_AUTH_SECRET: TEST_AUTH_SECRET,
     },
   },
 });
