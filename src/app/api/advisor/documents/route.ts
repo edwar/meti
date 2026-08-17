@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { put } from "@vercel/blob";
 import { v4 as uuidv4 } from "uuid";
 
 // POST: Upload verification document
@@ -61,18 +60,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create upload directory if it doesn't exists
-    const uploadDir = join(process.cwd(), "public", "uploads", "documents");
-    await mkdir(uploadDir, { recursive: true });
-
-    // Generate unique filename
+    // Upload file to Vercel Blob
     const fileExtension = file.name.split(".").pop();
     const fileName = `${uuidv4()}.${fileExtension}`;
-    const filePath = join(uploadDir, fileName);
-
-    // Write file
-    const bytes = await file.arrayBuffer();
-    await writeFile(filePath, Buffer.from(bytes));
+    const blob = await put(`uploads/documents/${fileName}`, file, {
+      access: "public",
+      contentType: file.type,
+    });
 
     // Create document record
     const document = await prisma.advisorDocument.create({
@@ -80,7 +74,7 @@ export async function POST(request: NextRequest) {
         advisorId: advisorProfile.id,
         documentType,
         fileName: file.name,
-        fileUrl: `/uploads/documents/${fileName}`,
+        fileUrl: blob.url,
         fileSize: file.size,
         mimeType: file.type,
         aiStatus: "PENDING",
