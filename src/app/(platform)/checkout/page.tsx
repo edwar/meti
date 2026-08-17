@@ -79,7 +79,7 @@ function CheckoutContent() {
         const data = await res.json();
         if (data.promotion) setPromotion(data.promotion);
       }
-    } catch {}
+    } catch { }
   };
 
   const checkLoginStatus = async () => {
@@ -249,7 +249,7 @@ function CheckoutContent() {
                           Este asesor está en modo prueba
                         </p>
                         <p className="text-sm text-[var(--text-muted)] mt-1">
-                          El pago no es real. Puedes probar el flujo de compra sin gastar dinero.
+                          El pago no es real. El asesor esta probando sus servicios antes de ofrecerlos al público.
                         </p>
                       </div>
                     </div>

@@ -26,6 +26,9 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24,
   },
+  // Los tests E2E crean muchos usuarios seguidos: desactivar rate limit
+  // explícitamente para la suite (env DISABLE_RATE_LIMIT=1).
+  rateLimit: process.env.DISABLE_RATE_LIMIT === "1" ? { enabled: false } : undefined,
   user: {
     additionalFields: {
       role: {

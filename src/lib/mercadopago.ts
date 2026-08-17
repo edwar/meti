@@ -66,6 +66,9 @@ export async function createCheckoutPreference({
   return {
     preferenceId: preference.id,
     initPoint: preference.init_point,
+    // El checkout de sandbox usa su propio subdominio; init_point (www)
+    // solo funciona con preferencias de producción.
+    sandboxInitPoint: preference.sandbox_init_point || null,
   };
 }
 

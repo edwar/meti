@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { createCheckoutPreference } from "@/lib/mercadopago";
 import { parseLocalISO } from "@/lib/timezone";
+import { calculatePrices } from "@/lib/pricing";
 
 const appointmentSchema = z.object({
   advisorId: z.string(),
@@ -67,9 +68,11 @@ export async function POST(request: NextRequest) {
 
     // Calculate prices — el fee SIEMPRE se calcula sobre el precio ORIGINAL
     // (el descuento lo absorbe el asesor, la plataforma mantiene su comisión)
-    const advisorEarning = Math.max(service.priceCents - discountCents, 0);
-    const platformFee = Math.round(service.priceCents * (feePercentage / 100));
-    const totalCents = advisorEarning + platformFee;
+    const { advisorEarning, platformFee, totalCents } = calculatePrices({
+      servicePriceCents: service.priceCents,
+      feePercentage,
+      discountCents,
+    });
 
     // Parsear fecha/hora local (Colombia) del ISO y construir el timestamp UTC
     // explícitamente — independiente del timezone del servidor.
@@ -97,26 +100,30 @@ export async function POST(request: NextRequest) {
     try {
       // Create the Checkout Pro preference with the ADVISOR's credentials
       // (sin custodia: el pago llega directo a la cuenta del asesor).
-      const { preferenceId, initPoint } = await createCheckoutPreference({
-        accessToken: advisorProfile.mpAccessToken,
-        items: [
-          {
-            id: service.id,
-            title: service.name,
-            unitPriceCents: totalCents,
-          },
-        ],
-        externalReference: appointment.id,
-        payerEmail: session.user.email,
-      });
+      const { preferenceId, initPoint, sandboxInitPoint } =
+        await createCheckoutPreference({
+          accessToken: advisorProfile.mpAccessToken,
+          items: [
+            {
+              id: service.id,
+              title: service.name,
+              unitPriceCents: totalCents,
+            },
+          ],
+          externalReference: appointment.id,
+          payerEmail: session.user.email,
+        });
 
       await prisma.appointment.update({
         where: { id: appointment.id },
         data: { mpPreferenceId: preferenceId },
       });
 
+      // En modo prueba, el checkout debe ir al subdominio sandbox de MP
+      const checkoutUrl = isTest && sandboxInitPoint ? sandboxInitPoint : initPoint;
+
       return NextResponse.json(
-        { appointment, initPoint, preferenceId },
+        { appointment, initPoint: checkoutUrl, preferenceId },
         { status: 201 }
       );
     } catch (prefError) {

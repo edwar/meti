@@ -45,3 +45,7 @@ next-env.d.ts
 
 # user uploaded files (verification documents - DO NOT commit)
 /public/uploads
+
+# playwright
+/test-results
+/playwright-report
