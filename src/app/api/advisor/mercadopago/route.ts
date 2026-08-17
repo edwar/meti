@@ -118,17 +118,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate format — APP_USR- (production) or TEST- (sandbox)
-    if (!publicKey.startsWith("APP_USR-") && !publicKey.startsWith("TEST-")) {
+    // Validate format
+    if (!publicKey.startsWith("APP_USR-")) {
       return NextResponse.json(
-        { error: "Public Key inválido. Debe comenzar con APP_USR- o TEST-" },
+        { error: "Public Key inválido. Debe comenzar con APP_USR-" },
         { status: 400 }
       );
     }
 
-    if (!accessToken.startsWith("APP_USR-") && !accessToken.startsWith("TEST-")) {
+    if (!accessToken.startsWith("APP_USR-")) {
       return NextResponse.json(
-        { error: "Access Token inválido. Debe comenzar con APP_USR- o TEST-" },
+        { error: "Access Token inválido. Debe comenzar con APP_USR-" },
         { status: 400 }
       );
     }
