@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { name, description, minimumPriceCents, feePercentage, color } =
+    const { name, description, minimumPriceCents, feePercentage, maxFeeCents, color } =
       await request.json();
 
     if (!name) {
@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
         description: description || null,
         minimumPriceCents: minimumPriceCents || 10000,
         feePercentage: feePercentage || 15,
+        maxFeeCents: maxFeeCents || 100000,
         color: color || "#FF6B35",
       },
     });
@@ -125,6 +126,7 @@ export async function PUT(request: NextRequest) {
         data: {
           minimumPriceCents: category.minimumPriceCents,
           feePercentage: category.feePercentage,
+          maxFeeCents: category.maxFeeCents,
         },
       });
     }

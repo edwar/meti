@@ -46,31 +46,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get service
+    // Get service with category
     const service = await prisma.advisorService.findUnique({
       where: { id: serviceId },
+      include: {
+        category: {
+          select: {
+            feePercentage: true,
+            minimumPriceCents: true,
+            maxFeeCents: true,
+          },
+        },
+      },
     });
 
     if (!service) {
       return NextResponse.json({ error: "Service not found" }, { status: 404 });
     }
 
-    // Get fee percentage from category (or default 15%)
-    const advisorCategories = await prisma.advisorCategory.findMany({
-      where: { advisorId: advisorProfile.id },
-      include: { category: true },
-    });
-
+    // Get fee percentage and max fee from service's category (or defaults)
     let feePercentage = 15; // Default
-    if (advisorCategories.length > 0) {
-      feePercentage = advisorCategories[0].category.feePercentage;
+    let maxFeeCents: number | null = null;
+    if (service.category) {
+      feePercentage = service.category.feePercentage;
+      maxFeeCents = service.category.maxFeeCents;
     }
 
     // Calculate prices — el fee SIEMPRE se calcula sobre el precio ORIGINAL
     // (el descuento lo absorbe el asesor, la plataforma mantiene su comisión)
+    // Si el fee supera maxFeeCents, se usa maxFeeCents.
     const { advisorEarning, platformFee, totalCents } = calculatePrices({
       servicePriceCents: service.priceCents,
       feePercentage,
+      maxFeeCents,
       discountCents,
     });
 

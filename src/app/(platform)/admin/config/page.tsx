@@ -20,6 +20,7 @@ interface Category {
   color: string | null;
   minimumPriceCents: number;
   feePercentage: number;
+  maxFeeCents: number;
   isActive: boolean;
 }
 
@@ -36,6 +37,7 @@ export default function ConfigPage() {
   const [newDescription, setNewDescription] = useState("");
   const [newMinPrice, setNewMinPrice] = useState(100);
   const [newFee, setNewFee] = useState(15);
+  const [newMaxFee, setNewMaxFee] = useState(1000);
   const [newColor, setNewColor] = useState("#FF6B35");
 
   useEffect(() => {
@@ -81,6 +83,7 @@ export default function ConfigPage() {
           description: newDescription || null,
           minimumPriceCents: newMinPrice * 100,
           feePercentage: newFee,
+          maxFeeCents: newMaxFee * 100,
           color: newColor,
         }),
       });
@@ -131,6 +134,7 @@ export default function ConfigPage() {
     setNewDescription("");
     setNewMinPrice(100);
     setNewFee(15);
+    setNewMaxFee(1000);
     setNewColor("#FF6B35");
   };
 
@@ -157,12 +161,17 @@ export default function ConfigPage() {
     }
   };
 
-  const calculateExample = (priceCents: number, feePercentage: number) => {
-    const fee = Math.round(priceCents * (feePercentage / 100));
+  const calculateExample = (priceCents: number, feePercentage: number, maxFeeCents: number) => {
+    let fee = Math.round(priceCents * (feePercentage / 100));
+    const appliedMax = fee > maxFeeCents;
+    if (appliedMax) {
+      fee = maxFeeCents;
+    }
     return {
       advisor: priceCents,
       fee,
       total: priceCents + fee,
+      appliedMax,
     };
   };
 
@@ -218,7 +227,7 @@ export default function ConfigPage() {
         {/* Categories */}
         <div className="space-y-4">
           {categories.map((category) => {
-            const example = calculateExample(50000, category.feePercentage);
+            const example = calculateExample(50000, category.feePercentage, category.maxFeeCents);
             return (
               <Card key={category.id}>
                 <CardHeader>
@@ -252,7 +261,7 @@ export default function ConfigPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Minimum Price */}
                     <div>
                       <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
@@ -296,6 +305,26 @@ export default function ConfigPage() {
                         Porcentaje que se añade al precio del asesor
                       </p>
                     </div>
+
+                    {/* Max Fee */}
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                        <DollarSign className="w-4 h-4 inline mr-1" />
+                        Fee máximo
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <CurrencyInput
+                          value={Math.round(category.maxFeeCents / 100)}
+                          onChange={(v) => handleUpdateCategory(category.id, "maxFeeCents", v * 100)}
+                          className="w-40"
+                          min={0}
+                        />
+                        <span className="text-sm text-[var(--text-muted)]">pesos</span>
+                      </div>
+                      <p className="text-xs text-[var(--text-muted)] mt-1">
+                        Tope máximo del fee (si el % supera este valor)
+                      </p>
+                    </div>
                   </div>
 
                   {/* Example calculation */}
@@ -311,9 +340,9 @@ export default function ConfigPage() {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-[var(--text-muted)]">
-                        Fee ({category.feePercentage}%):
+                        Fee ({category.feePercentage}%){example.appliedMax ? ` → Máx: ${formatCurrency(category.maxFeeCents)}` : ""}:
                       </span>
-                      <span className="text-[var(--text-primary)]">
+                      <span className={example.appliedMax ? "text-[var(--warning)] font-medium" : "text-[var(--text-primary)]"}>
                         {formatCurrency(example.fee)}
                       </span>
                     </div>
@@ -359,7 +388,7 @@ export default function ConfigPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1.5">
                       Precio mínimo ($)
@@ -378,6 +407,12 @@ export default function ConfigPage() {
                       max={100}
                       step={0.5}
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5">
+                      Fee máximo ($)
+                    </label>
+                    <CurrencyInput value={newMaxFee} onChange={setNewMaxFee} min={0} />
                   </div>
                 </div>
 
@@ -415,7 +450,7 @@ export default function ConfigPage() {
                     <div>
                       <p className="font-medium">{newName || "Nombre del rubro"}</p>
                       <p className="text-xs text-[var(--text-muted)]">
-                        Mínimo: ${newMinPrice} · Fee: {newFee}%
+                        Mínimo: ${newMinPrice} · Fee: {newFee}% · Máx: ${newMaxFee}
                       </p>
                     </div>
                   </div>

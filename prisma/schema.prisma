@@ -162,12 +162,14 @@ model Category {
   // Pricing configuration per category
   minimumPriceCents Int      @default(10000) // $100 minimum in cents
   feePercentage     Float    @default(15.0)  // 15% platform fee
+  maxFeeCents       Int      @default(100000) // Fee máximo $1,000 en centavos
   
   isActive          Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   advisors          AdvisorCategory[]
+  services          AdvisorService[]
 
   @@map("categories")
 }
@@ -213,6 +215,7 @@ model BlockedTime {
 model AdvisorService {
   id                  String   @id @default(cuid())
   advisorId           String
+  categoryId          String?  // Rubro del servicio (define fee y precio mínimo)
   name                String   // "Consulta General"
   description         String?  @db.Text
   durationMin         Int      // 30, 60, 90, 120...
@@ -223,6 +226,7 @@ model AdvisorService {
   updatedAt           DateTime @updatedAt
 
   advisor             AdvisorProfile @relation(fields: [advisorId], references: [id], onDelete: Cascade)
+  category            Category?      @relation(fields: [categoryId], references: [id])
   appointments        Appointment[]
   promotions          Promotion[]
 
