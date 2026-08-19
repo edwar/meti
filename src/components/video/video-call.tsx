@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingPage } from "@/components/ui/loading";
 import { ChatPanel } from "@/components/video/chat-panel";
+import { TimeWarning } from "@/components/video/time-warning";
 import { VideoOff, Circle, Square } from "lucide-react";
 
 interface VideoCallProps {
@@ -22,6 +23,11 @@ interface VideoCallProps {
   userId: string;
 }
 
+interface AppointmentData {
+  scheduledAt: string;
+  durationMin: number;
+}
+
 export function VideoCall({ appointmentId, userRole, userName, userId }: VideoCallProps) {
   const [token, setToken] = useState<string | null>(null);
   const [roomUrl, setRoomUrl] = useState<string | null>(null);
@@ -29,6 +35,25 @@ export function VideoCall({ appointmentId, userRole, userName, userId }: VideoCa
   const [error, setError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingError, setRecordingError] = useState<string | null>(null);
+  const [appointment, setAppointment] = useState<AppointmentData | null>(null);
+
+  useEffect(() => {
+    const fetchAppointment = async () => {
+      try {
+        const res = await fetch(`/api/appointments/${appointmentId}`, {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setAppointment(data.appointment);
+        }
+      } catch (error) {
+        console.error("Error fetching appointment:", error);
+      }
+    };
+
+    fetchAppointment();
+  }, [appointmentId]);
 
   useEffect(() => {
     const getToken = async () => {
@@ -160,6 +185,14 @@ export function VideoCall({ appointmentId, userRole, userName, userId }: VideoCa
               )}
             </Button>
           </div>
+
+          {/* Aviso de tiempo restante */}
+          {appointment && (
+            <TimeWarning
+              scheduledAt={appointment.scheduledAt}
+              durationMin={appointment.durationMin}
+            />
+          )}
 
           <ChatPanel
             appointmentId={appointmentId}
