@@ -12,6 +12,7 @@ import { useDialog } from "@/hooks/use-dialog";
 import { useAdvisorProfile, useUpdateProfile } from "@/lib/hooks";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { RatingStars } from "@/components/ui/rating-stars";
+import { PhoneInput } from "@/components/ui/phone-input";
 import {
   Save,
   Video,
@@ -22,6 +23,7 @@ import {
   Clock,
   Eye,
   EyeOff,
+  Phone,
 } from "lucide-react";
 import "lite-youtube-embed/src/lite-yt-embed.css";
 import { sileo } from "sileo";
@@ -41,6 +43,7 @@ export default function ProfilePage() {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [bookingLeadHours, setBookingLeadHours] = useState(24);
   const [isHidden, setIsHidden] = useState(false);
+  const [whatsappPhone, setWhatsappPhone] = useState("");
 
   useEffect(() => {
     if (data?.profile) {
@@ -48,6 +51,7 @@ export default function ProfilePage() {
       setVideoUrl(data.profile.videoUrl || "");
       setBookingLeadHours(data.profile.bookingLeadHours || 24);
       setIsHidden(data.profile.isHidden || false);
+      setWhatsappPhone(data.profile.whatsappPhone || "");
       setSelectedCategoryIds((data.profile.categories || []).map((c: any) => c.id));
       fetchDocuments();
       fetchCategories();
@@ -118,7 +122,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     updateProfile.mutate(
-      { bio, videoUrl: videoUrl || undefined, categoryIds: selectedCategoryIds, bookingLeadHours },
+      { bio, videoUrl: videoUrl || undefined, categoryIds: selectedCategoryIds, bookingLeadHours, whatsappPhone: whatsappPhone || undefined },
       {
         onSuccess: () => {
           setHasChanges(false);
@@ -380,6 +384,31 @@ export default function ProfilePage() {
                     />
                   </button>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* WhatsApp (Contacto admin) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Phone className="w-5 h-5 text-[var(--success)]" />
+                  WhatsApp de contacto
+                </CardTitle>
+                <CardDescription>
+                  Para comunicación con el equipo de Meti
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PhoneInput
+                  value={whatsappPhone}
+                  onChange={(val) => {
+                    setWhatsappPhone(val);
+                    setHasChanges(true);
+                  }}
+                />
+                <p className="text-xs text-[var(--text-muted)] mt-2">
+                  Este número solo será visible por los administradores del sistema para contactarte en caso de inconvenientes con la configuración.
+                </p>
               </CardContent>
             </Card>
           </div>
