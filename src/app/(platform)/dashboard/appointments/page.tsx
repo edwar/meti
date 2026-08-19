@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingPage } from "@/components/ui/loading";
-import { Calendar, Clock, Video, Star, MessageSquare } from "lucide-react";
+import { AlertDialog } from "@/components/ui/alert-dialog";
+import { useDialog } from "@/hooks/use-dialog";
+import { Calendar, Clock, Video, Star, MessageSquare, CreditCard, XCircle } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -25,6 +27,7 @@ interface Appointment {
 }
 
 export default function AppointmentsPage() {
+  const dialog = useDialog();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
@@ -32,6 +35,8 @@ export default function AppointmentsPage() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [retryingId, setRetryingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAppointments();
@@ -71,8 +76,10 @@ export default function AppointmentsPage() {
         return <Badge variant="secondary">Completada</Badge>;
       case "CANCELLED":
         return <Badge variant="destructive">Cancelada</Badge>;
+      case "PENDING":
+        return <Badge variant="warning">Pago pendiente</Badge>;
       default:
-        return <Badge variant="outline">Pendiente</Badge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
@@ -111,6 +118,54 @@ export default function AppointmentsPage() {
       sileo.error({ title: "Error", description: err.message || "No se pudo guardar la reseña." });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelAppointment = async (appointment: Appointment) => {
+    const confirmed = await dialog.showConfirm(
+      "Cancelar cita",
+      `¿Estás seguro de cancelar la cita de ${appointment.service.name} con ${appointment.advisor.user.name}? Esta acción no se puede deshacer.`,
+      "warning"
+    );
+    if (!confirmed) return;
+
+    setCancellingId(appointment.id);
+    try {
+      const res = await fetch(`/api/appointments/${appointment.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ reason: "Cancelado por el cliente" }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Error al cancelar la cita");
+      }
+      sileo.success({ title: "Cita cancelada", description: "El horario ha sido liberado." });
+      await fetchAppointments();
+    } catch (err: any) {
+      sileo.error({ title: "Error", description: err.message || "No se pudo cancelar la cita." });
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
+  const handleRetryPayment = async (appointmentId: string) => {
+    setRetryingId(appointmentId);
+    try {
+      const res = await fetch(`/api/appointments/${appointmentId}/pay`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Error al generar link de pago");
+      }
+      const { initPoint } = await res.json();
+      window.location.href = initPoint;
+    } catch (err: any) {
+      sileo.error({ title: "Error", description: err.message || "No se pudo generar el link de pago." });
+      setRetryingId(null);
     }
   };
 
@@ -214,6 +269,39 @@ export default function AppointmentsPage() {
 
                   <div className="flex items-center gap-2">
                     {getStatusBadge(apt.status)}
+                    {apt.status === "PENDING" && (
+                      <>
+                        <Button
+                          size="sm"
+                          onClick={() => handleRetryPayment(apt.id)}
+                          disabled={retryingId === apt.id}
+                        >
+                          {retryingId === apt.id ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <>
+                              <CreditCard className="w-4 h-4 mr-1" />
+                              Pagar
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleCancelAppointment(apt)}
+                          disabled={cancellingId === apt.id}
+                        >
+                          {cancellingId === apt.id ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <>
+                              <XCircle className="w-4 h-4 mr-1" />
+                              Cancelar
+                            </>
+                          )}
+                        </Button>
+                      </>
+                    )}
                     {(apt.status === "CONFIRMED" || apt.status === "IN_PROGRESS") && (
                       <Button size="sm" asChild>
                         <Link href={`/call/${apt.id}`}>
@@ -301,6 +389,8 @@ export default function AppointmentsPage() {
           </Card>
         </div>
       )}
+
+      <AlertDialog state={dialog} />
     </div>
   );
 }
