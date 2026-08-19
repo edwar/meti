@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Cron: Auto-expire PENDING appointments after 15 minutes
-// Runs every 5 minutes via Vercel cron (vercel.json)
-// This frees up slots that were blocked by unpaid appointments.
+// Cron: Daily cleanup of expired PENDING appointments
+// Runs once daily via Vercel cron (Hobby plan limitation).
+// Primary expiration happens on-demand in /api/slots when users query availability.
+// This cron is a safety net to catch any stale records.
 export async function GET(request: Request) {
   // Protect with cron secret (Vercel injects it in the header)
   const authHeader = request.headers.get("authorization");
