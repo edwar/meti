@@ -17,6 +17,22 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Auto-expire PENDING appointments older than 15 minutes for this advisor
+    // This frees slots without relying on a frequent cron (Hobby plan limitation)
+    const expiryThreshold = new Date(Date.now() - 15 * 60 * 1000);
+    await prisma.appointment.updateMany({
+      where: {
+        advisorId,
+        status: "PENDING",
+        createdAt: { lt: expiryThreshold },
+      },
+      data: {
+        status: "CANCELLED",
+        cancelReason: "Pago no completado - expirado después de 15 minutos",
+        cancelledAt: new Date(),
+      },
+    });
+
     // Get advisor schedule for the requested date
     const requestDate = new Date(date);
     const dayOfWeek = requestDate.getDay();

@@ -18,7 +18,10 @@ export async function GET() {
     const userId = session.user.id;
 
     const appointments = await prisma.appointment.findMany({
-      where: { clientId: userId },
+      where: {
+        clientId: userId,
+        status: { not: "CANCELLED" },
+      },
       include: {
         advisor: {
           include: { user: true },
