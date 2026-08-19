@@ -7,6 +7,7 @@ import { z } from "zod";
 const serviceSchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
   description: z.string().optional(),
+  categoryId: z.string().optional(),
   durationMin: z.number().min(15, "Mínimo 15 minutos").max(480, "Máximo 8 horas"),
   priceCents: z.number().min(10000, "Precio mínimo $100"),
   rescheduleHoursMin: z.number().min(0).max(168).default(24),
@@ -34,6 +35,16 @@ export async function GET() {
 
     const services = await prisma.advisorService.findMany({
       where: { advisorId: advisorProfile.id },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            feePercentage: true,
+            minimumPriceCents: true,
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
 
@@ -82,6 +93,7 @@ export async function POST(request: NextRequest) {
         advisorId: advisorProfile.id,
         name: validatedData.name,
         description: validatedData.description,
+        categoryId: validatedData.categoryId || null,
         durationMin: validatedData.durationMin,
         priceCents: validatedData.priceCents,
         rescheduleHoursMin: validatedData.rescheduleHoursMin,

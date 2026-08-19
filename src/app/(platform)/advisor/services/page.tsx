@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CurrencyInput } from "@/components/ui/currency-input";
+import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingPage } from "@/components/ui/loading";
@@ -16,7 +17,7 @@ import {
   useUpdateService,
   useDeleteService,
 } from "@/lib/hooks";
-import { Plus, Briefcase, Clock, DollarSign, Edit, Trash2, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { Plus, Briefcase, Clock, DollarSign, Edit, Trash2, Eye, EyeOff, AlertTriangle, Tag } from "lucide-react";
 import { sileo } from "sileo";
 
 function formatCurrency(cents: number) {
@@ -172,6 +173,12 @@ export default function ServicesPage() {
                         <DollarSign className="w-4 h-4" />
                         {formatCurrency(service.priceCents)} tu ganancia
                       </div>
+                      {service.category && (
+                        <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
+                          <Tag className="w-4 h-4" />
+                          {service.category.name} ({service.category.feePercentage}%, Máx: {formatCurrency(service.category.maxFeeCents)})
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -220,7 +227,9 @@ export default function ServicesPage() {
                       Precio final para el cliente
                     </span>
                     <span className="font-heading font-bold text-[var(--text-primary)]">
-                      {formatCurrency(Math.round(service.priceCents * 1.15))}
+                      {formatCurrency(
+                        service.priceCents + Math.round(service.priceCents * ((service.category?.feePercentage || 15) / 100))
+                      )}
                     </span>
                   </div>
                 </div>
@@ -284,9 +293,43 @@ function ServiceModal({
 }) {
   const [name, setName] = useState(service?.name || "");
   const [description, setDescription] = useState(service?.description || "");
+  const [categoryId, setCategoryId] = useState(service?.categoryId || "");
   const [duration, setDuration] = useState(service?.durationMin || 60);
   const [price, setPrice] = useState(service ? service.priceCents / 100 : 50);
   const [rescheduleHours, setRescheduleHours] = useState(service?.rescheduleHoursMin || 24);
+  const [categories, setCategories] = useState<any[]>([]);
+
+  // Fetch advisor's categories on mount
+  useState(() => {
+    fetch("/api/advisor/profile", { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        setCategories(data.profile?.categories || []);
+      })
+      .catch(() => {});
+  });
+
+  // Get selected category details
+  const selectedCategory = categories.find((c) => c.id === categoryId);
+  const feePercentage = selectedCategory?.feePercentage || 15;
+  const minimumPriceCents = selectedCategory?.minimumPriceCents || 10000;
+  const minimumPriceDollars = minimumPriceCents / 100;
+  const maxFeeCents = selectedCategory?.maxFeeCents || 100000;
+
+  // Calculate price breakdown
+  const priceCents = price * 100;
+  let platformFee = Math.round(priceCents * (feePercentage / 100));
+  const appliedMaxFee = platformFee > maxFeeCents;
+  if (appliedMaxFee) {
+    platformFee = maxFeeCents;
+  }
+  const totalForClient = priceCents + platformFee;
+
+  // Category options for Select
+  const categoryOptions = categories.map((cat) => ({
+    value: cat.id,
+    label: `${cat.name} (Fee: ${cat.feePercentage}%, Máx: ${formatCurrency(cat.maxFeeCents)})`,
+  }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -294,6 +337,7 @@ function ServiceModal({
       id: service?.id,
       name,
       description: description || undefined,
+      categoryId: categoryId || undefined,
       durationMin: duration,
       priceCents: price * 100,
       rescheduleHoursMin: rescheduleHours,
@@ -318,6 +362,22 @@ function ServiceModal({
                 placeholder="Ej: Consulta General"
                 required
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                Rubro *
+              </label>
+              <Select
+                options={categoryOptions}
+                value={categoryId}
+                onChange={setCategoryId}
+                placeholder="Selecciona un rubro"
+              />
+              {selectedCategory && (
+                <p className="text-xs text-[var(--text-muted)] mt-1">
+                  Fee de plataforma: {feePercentage}% • Fee máximo: {formatCurrency(maxFeeCents)} • Precio mínimo: {formatCurrency(minimumPriceCents)}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
@@ -351,16 +411,33 @@ function ServiceModal({
                 <CurrencyInput
                   value={price}
                   onChange={setPrice}
-                  min={100}
+                  min={minimumPriceDollars}
                   required
                 />
+                {price < minimumPriceDollars && (
+                  <p className="text-xs text-[var(--error)] mt-1">
+                    El precio mínimo para este rubro es {formatCurrency(minimumPriceCents)}
+                  </p>
+                )}
               </div>
             </div>
-            <div className="p-3 rounded-lg bg-[var(--background)] text-sm">
-              <span className="text-[var(--text-muted)]">Precio final cliente: </span>
-              <span className="font-bold text-[var(--primary)]">
-                {formatCurrency(Math.round(price * 100 * 1.15))}
-              </span>
+            <div className="p-3 rounded-lg bg-[var(--background)] text-sm space-y-1">
+              <div className="flex justify-between">
+                <span className="text-[var(--text-muted)]">Tu ganancia:</span>
+                <span className="font-medium">{formatCurrency(priceCents)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[var(--text-muted)]">
+                  Fee ({feePercentage}%){appliedMaxFee ? ` → Máx: ${formatCurrency(maxFeeCents)}` : ""}:
+                </span>
+                <span className={appliedMaxFee ? "font-medium text-[var(--warning)]" : "font-medium"}>
+                  {formatCurrency(platformFee)}
+                </span>
+              </div>
+              <div className="flex justify-between pt-1 border-t border-[var(--border)]">
+                <span className="text-[var(--text-muted)]">Precio final cliente:</span>
+                <span className="font-bold text-[var(--primary)]">{formatCurrency(totalForClient)}</span>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
@@ -401,7 +478,7 @@ function ServiceModal({
               <Button type="button" variant="secondary" onClick={onClose}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading || price < minimumPriceDollars}>
                 {isLoading ? "Guardando..." : service ? "Guardar cambios" : "Crear servicio"}
               </Button>
             </div>
