@@ -67,6 +67,8 @@ export async function GET(request: NextRequest) {
           0
         ),
         joinDate: a.user.createdAt.toISOString(),
+        mpMode: a.mpMode,
+        whatsappPhone: a.whatsappPhone,
       })),
     });
   } catch (error) {

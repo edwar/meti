@@ -10,6 +10,7 @@ const profileSchema = z.object({
   videoUrl: z.string().url().optional().or(z.literal("")),
   bookingLeadHours: z.number().int().min(0).max(168).optional(),
   isHidden: z.boolean().optional(),
+  whatsappPhone: z.string().optional(),
 });
 
 // GET: Get profile
@@ -66,6 +67,7 @@ export async function GET() {
         isVerified: advisorProfile.isVerified,
         verificationStatus: advisorProfile.verificationStatus,
         createdAt: advisorProfile.createdAt,
+        whatsappPhone: advisorProfile.whatsappPhone,
         user: advisorProfile.user,
         categories: advisorProfile.categories.map((ac: any) => ac.category),
       },
@@ -122,6 +124,9 @@ export async function PUT(request: NextRequest) {
           : {}),
         ...(validatedData.isHidden !== undefined
           ? { isHidden: validatedData.isHidden }
+          : {}),
+        ...(validatedData.whatsappPhone !== undefined
+          ? { whatsappPhone: validatedData.whatsappPhone || null }
           : {}),
       },
     });

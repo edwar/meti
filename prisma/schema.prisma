@@ -122,7 +122,10 @@ model AdvisorProfile {
 
   // Booking
   bookingLeadHours Int      @default(24) // Anticipación mínima para agendar (horas)
-  
+
+  // Contact (admin only)
+  whatsappPhone    String?  // Teléfono de WhatsApp para contacto admin
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

@@ -10,7 +10,7 @@ import { LoadingPage } from "@/components/ui/loading";
 import { AlertDialog } from "@/components/ui/alert-dialog";
 import { useDialog } from "@/hooks/use-dialog";
 import { useAdminAdvisors, useUpdateAdvisorStatus } from "@/lib/hooks";
-import { Search, Briefcase, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Search, Briefcase, CheckCircle, XCircle, Clock, TestTube, MessageCircle } from "lucide-react";
 
 export default function AdvisorsPage() {
   const dialog = useDialog();
@@ -25,6 +25,24 @@ export default function AdvisorsPage() {
   const updateStatus = useUpdateAdvisorStatus();
 
   const advisors = data?.advisors || [];
+
+  const getTimeElapsed = (joinDate: string) => {
+    const now = new Date();
+    const created = new Date(joinDate);
+    const diffMs = now.getTime() - created.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+    if (diffDays > 0) return `${diffDays} día${diffDays > 1 ? "s" : ""}`;
+    if (diffHours > 0) return `${diffHours} hora${diffHours > 1 ? "s" : ""}`;
+    return "Recién registrado";
+  };
+
+  const handleContactWhatsApp = (phone: string, name: string) => {
+    const cleanPhone = phone.replace(/[^0-9+]/g, "");
+    const message = encodeURIComponent(`Hola ${name}, somos el equipo de Meti. Queremos ayudarte con la configuración de tu cuenta.`);
+    window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank");
+  };
 
   const handleApprove = async (id: string, name: string) => {
     const confirmed = await dialog.showConfirm(
@@ -169,7 +187,7 @@ export default function AdvisorsPage() {
                 {advisors.map((advisor: any) => (
                   <div
                     key={advisor.id}
-                    className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-lg bg-[var(--background)]"
+                    className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-lg bg-[var(--background)] ${advisor.mpMode === "TEST" ? "border-2 border-[var(--warning)]" : ""}`}
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full bg-[var(--primary-light)] flex items-center justify-center flex-shrink-0">
@@ -189,10 +207,32 @@ export default function AdvisorsPage() {
                           >
                             {advisor.status === "active" ? "Activo" : "Pendiente"}
                           </Badge>
+                          {advisor.mpMode === "TEST" && (
+                            <Badge variant="warning" className="flex items-center gap-1">
+                              <TestTube className="w-3 h-3" />
+                              Modo prueba · {getTimeElapsed(advisor.joinDate)}
+                            </Badge>
+                          )}
                         </div>
                         <p className="text-sm text-[var(--text-muted)]">
                           {advisor.speciality} • {advisor.email}
                         </p>
+                        {advisor.mpMode === "TEST" && advisor.whatsappPhone && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-[var(--text-muted)]">
+                              📱 {advisor.whatsappPhone}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 px-2 text-xs text-[var(--success)]"
+                              onClick={() => handleContactWhatsApp(advisor.whatsappPhone, advisor.name)}
+                            >
+                              <MessageCircle className="w-3 h-3 mr-1" />
+                              Contactar
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
