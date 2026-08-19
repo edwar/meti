@@ -12,6 +12,7 @@ import { useDialog } from "@/hooks/use-dialog";
 import { useAdvisorProfile, useUpdateProfile } from "@/lib/hooks";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { RatingStars } from "@/components/ui/rating-stars";
+import { PhoneInput } from "@/components/ui/phone-input";
 import {
   Save,
   Video,
@@ -398,14 +399,12 @@ export default function ProfilePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Input
-                  type="tel"
+                <PhoneInput
                   value={whatsappPhone}
-                  onChange={(e) => {
-                    setWhatsappPhone(e.target.value);
+                  onChange={(val) => {
+                    setWhatsappPhone(val);
                     setHasChanges(true);
                   }}
-                  placeholder="+57 300 1234567"
                 />
                 <p className="text-xs text-[var(--text-muted)] mt-2">
                   Este número solo será visible por los administradores del sistema para contactarte en caso de inconvenientes con la configuración.
