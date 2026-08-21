@@ -79,11 +79,14 @@ export async function GET() {
     });
 
     // Citas confirmadas recientes (para notificaciones de nuevas reservas)
+    // Solo citas futuras o de hoy
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const recentAppointments = await prisma.appointment.findMany({
       where: {
         advisorId: advisorProfile.id,
         status: "CONFIRMED",
         updatedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+        scheduledAt: { gte: startOfToday },
       },
       include: {
         client: { select: { name: true } },
