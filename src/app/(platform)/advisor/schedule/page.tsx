@@ -518,9 +518,9 @@ export default function SchedulePage() {
                               </div>
                             ))}
                             {apts.slice(0, 2).map((apt) => (
-                              <Link key={apt.id} href={`/call/${apt.id}`} className={cn("block text-[10px] px-1 py-0.5 rounded truncate hover:opacity-80 transition-opacity", apt.status === "CONFIRMED" && "bg-[var(--primary)] text-white", apt.status === "PENDING" && "bg-[var(--warning)] text-white", apt.status === "COMPLETED" && "bg-[var(--success)] text-white")}>
+                              <div key={apt.id} className={cn("block text-[10px] px-1 py-0.5 rounded truncate", apt.status === "CONFIRMED" && "bg-[var(--primary)] text-white", apt.status === "PENDING" && "bg-[var(--warning)] text-white", apt.status === "COMPLETED" && "bg-[var(--success)] text-white")}>
                                 {format(new Date(apt.scheduledAt), "HH:mm")} {apt.client.name}
-                              </Link>
+                              </div>
                             ))}
                             {(blocked.length + apts.length) > 3 && (
                               <div className="text-[10px] text-[var(--text-muted)] pl-1">+{(blocked.length + apts.length) - 3} más</div>
@@ -566,9 +566,9 @@ export default function SchedulePage() {
                                   const topOffset = (getMinutes(aptStart) / 60) * 48;
 
                                     return (
-                                      <Link key={apt.id} href={`/call/${apt.id}`} className={cn("block absolute inset-x-0.5 rounded text-xs px-1.5 py-1 overflow-hidden hover:opacity-80 transition-opacity", apt.status === "CONFIRMED" && "bg-[var(--primary)] text-white", apt.status === "PENDING" && "bg-[var(--warning)] text-white", apt.status === "COMPLETED" && "bg-[var(--success)] text-white")} style={{ top: `${topOffset}px`, height: `${(apt.durationMin / 60) * 48}px` }}>
+                                      <div key={apt.id} className={cn("block absolute inset-x-0.5 rounded text-xs px-1.5 py-1 overflow-hidden", apt.status === "CONFIRMED" && "bg-[var(--primary)] text-white", apt.status === "PENDING" && "bg-[var(--warning)] text-white", apt.status === "COMPLETED" && "bg-[var(--success)] text-white")} style={{ top: `${topOffset}px`, height: `${(apt.durationMin / 60) * 48}px` }}>
                                         <div className="font-medium truncate">{apt.client.name}</div>
-                                      </Link>
+                                      </div>
                                     );
                                 })}
                               </div>
