@@ -382,6 +382,10 @@ model Appointment {
   recordingUrl    String?
   recordingEgressId String?          // Egress activo de LiveKit (grabación en curso)
 
+  // AI Notes
+  transcript      String?           @db.Text  // Transcripción completa de la llamada
+  summary         String?           @db.Text  // Resumen generado por IA
+
   // Cancellation
   cancelReason    String?
   cancelledAt     DateTime?

@@ -166,3 +166,54 @@ export async function sendReminderEmail(
 
   return !error;
 }
+
+// Email de resumen de asesoría
+export async function sendSummaryEmail(
+  to: string,
+  data: {
+    clientName: string;
+    advisorName: string;
+    serviceName: string;
+    scheduledAt: string;
+    summary: string;
+    appointmentUrl: string;
+  }
+): Promise<boolean> {
+  const client = getResend();
+  if (!client) return false;
+
+  // Convertir markdown básico a HTML
+  const summaryHtml = data.summary
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\n\n/g, "</p><p style='margin:0 0 12px;color:#374151;line-height:1.6;'>")
+    .replace(/\n- /g, "</p><li style='margin:0 0 8px;color:#374151;line-height:1.6;'>")
+    .replace(/\n/g, "<br/>");
+
+  const body = `
+    <p style="margin:0 0 16px;color:#374151;line-height:1.6;">Hola <strong>${data.clientName}</strong>,</p>
+    <p style="margin:0 0 16px;color:#374151;line-height:1.6;">Tu asesoría con <strong>${data.advisorName}</strong> ha finalizado. Aquí tienes el resumen:</p>
+    
+    <div style="background:#f9fafb;border-radius:12px;padding:20px;margin-bottom:20px;border:1px solid #e5e7eb;">
+      <h3 style="margin:0 0 12px;color:#1a1a2e;font-size:16px;">📋 Resumen de la asesoría</h3>
+      <div style="color:#374151;line-height:1.8;font-size:14px;">
+        <p style="margin:0 0 12px;">${summaryHtml}</p>
+      </div>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:14px;">
+      <tr><td style="padding:8px 0;color:#6b7280;">Servicio</td><td style="padding:8px 0;font-weight:600;color:#1a1a2e;text-align:right;">${data.serviceName}</td></tr>
+      <tr><td style="padding:8px 0;color:#6b7280;">Fecha</td><td style="padding:8px 0;font-weight:600;color:#1a1a2e;text-align:right;">${formatDate(data.scheduledAt)}</td></tr>
+    </table>
+
+    <a href="${data.appointmentUrl}" style="display:inline-block;background:#ff6b35;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Agendar otra cita</a>
+  `;
+
+  const { error } = await client.emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject: `📋 Resumen: ${data.serviceName} - ${formatDate(data.scheduledAt)}`,
+    html: layout("Resumen de asesoría", body),
+  });
+
+  return !error;
+}

@@ -19,7 +19,8 @@ import { LoadingPage } from "@/components/ui/loading";
 import { ChatPanel } from "@/components/video/chat-panel";
 import { CustomControlBar } from "@/components/video/custom-control-bar";
 import { TimeWarning } from "@/components/video/time-warning";
-import { VideoOff } from "lucide-react";
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
+import { VideoOff, Mic, Info } from "lucide-react";
 
 interface VideoCallProps {
   appointmentId: string;
@@ -47,17 +48,64 @@ function CallContent({
   const connectionState = useConnectionState();
   const isConnected = connectionState === ConnectionState.Connected;
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const room = useRoomContext();
   const router = useRouter();
 
-  const handleLeave = useCallback(() => {
+  const { isListening, isSupported, transcript, start, stop } =
+    useSpeechRecognition({
+      language: "es-CO",
+    });
+
+  // Iniciar transcripción cuando se conecta
+  useEffect(() => {
+    if (isConnected && isSupported) {
+      start();
+    }
+    return () => {
+      if (isListening) {
+        stop();
+      }
+    };
+  }, [isConnected]);
+
+  const handleLeave = useCallback(async () => {
+    // Detener transcripción
+    if (isListening) {
+      stop();
+    }
+
+    // Si hay transcripción, generar resumen antes de salir
+    if (transcript && transcript.trim().length > 50) {
+      setIsGeneratingSummary(true);
+      try {
+        await fetch(`/api/appointments/${appointmentId}/summary`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ transcript }),
+        });
+      } catch (error) {
+        console.error("Error generating summary:", error);
+      }
+    }
+
+    // Desconectar y navegar
     room?.disconnect();
     if (userRole === "client") {
       router.push(`/dashboard/appointments/${appointmentId}/review`);
     } else {
       router.push("/advisor/schedule");
     }
-  }, [room, userRole, appointmentId, router]);
+  }, [
+    room,
+    userRole,
+    appointmentId,
+    router,
+    isListening,
+    stop,
+    transcript,
+  ]);
 
   const tracks = useTracks([
     { source: Track.Source.Camera, withPlaceholder: true },
@@ -78,15 +126,19 @@ function CallContent({
         {/* Grid de participantes */}
         <div className="flex-1 min-h-0 p-2">
           <div
-            className={`h-full gap-2 ${tracks.length <= 1
+            className={`h-full gap-2 ${
+              tracks.length <= 1
                 ? "grid grid-cols-1"
                 : tracks.length <= 2
-                  ? "grid grid-cols-2"
-                  : "grid grid-cols-2 grid-rows-2"
-              }`}
+                ? "grid grid-cols-2"
+                : "grid grid-cols-2 grid-rows-2"
+            }`}
           >
             {tracks.map((track, index) => (
-              <div key={`${track.source}-${track.participant?.identity ?? index}`} className="relative rounded-lg overflow-hidden bg-[var(--surface)]">
+              <div
+                key={`${track.source}-${track.participant?.identity ?? index}`}
+                className="relative rounded-lg overflow-hidden bg-[var(--surface)]"
+              >
                 <ParticipantTile
                   trackRef={track}
                   className="h-full w-full"
@@ -95,6 +147,32 @@ function CallContent({
             ))}
           </div>
         </div>
+
+        {/* Indicador de transcripción */}
+        {isSupported && (
+          <div className="absolute top-4 left-4 z-20">
+            <div
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                isListening
+                  ? "bg-[var(--success)] text-white"
+                  : "bg-[var(--surface)] text-[var(--text-muted)] border border-[var(--border)]"
+              }`}
+            >
+              <Mic className="w-3 h-3" />
+              {isListening ? "Transcribiendo..." : "Transcripción desactivada"}
+            </div>
+          </div>
+        )}
+
+        {/* Banner sutil de Chrome (solo si no está soportado) */}
+        {!isSupported && (
+          <div className="absolute top-4 left-4 z-20">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--surface)] text-[var(--text-muted)] border border-[var(--border)]">
+              <Info className="w-3 h-3" />
+              <span>Usa Chrome para resúmenes automáticos</span>
+            </div>
+          </div>
+        )}
 
         {/* Barra de controles */}
         <CustomControlBar
@@ -122,11 +200,30 @@ function CallContent({
         isOpen={isChatOpen}
         onToggle={() => setIsChatOpen(!isChatOpen)}
       />
+
+      {/* Modal de generando resumen */}
+      {isGeneratingSummary && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <Card className="w-full max-w-sm">
+            <CardContent className="p-8 text-center">
+              <LoadingPage label="Generando resumen de la asesoría..." className="min-h-0" />
+              <p className="text-sm text-[var(--text-muted)] mt-4">
+                La IA está procesando los apuntes de la reunión.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </LayoutContextProvider>
   );
 }
 
-export function VideoCall({ appointmentId, userRole, userName, userId }: VideoCallProps) {
+export function VideoCall({
+  appointmentId,
+  userRole,
+  userName,
+  userId,
+}: VideoCallProps) {
   const [token, setToken] = useState<string | null>(null);
   const [roomUrl, setRoomUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
