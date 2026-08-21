@@ -62,6 +62,19 @@ interface Appointment {
   service: { name: string; durationMin: number };
 }
 
+// Verificar si la cita está dentro del rango de tiempo para unirse
+function isAppointmentJoinable(scheduledAt: string, durationMin: number): boolean {
+  const now = new Date();
+  const start = new Date(scheduledAt);
+  const end = new Date(start.getTime() + durationMin * 60000);
+  
+  // Permitir ingresar 5 minutos antes y 10 después del fin
+  const bufferStart = new Date(start.getTime() - 5 * 60000);
+  const bufferEnd = new Date(end.getTime() + 10 * 60000);
+  
+  return now >= bufferStart && now <= bufferEnd;
+}
+
 interface DaySchedule {
   dayOfWeek: number;
   dayName: string;
@@ -604,7 +617,7 @@ export default function SchedulePage() {
                                       <Badge variant={apt.status === "CONFIRMED" ? "default" : apt.status === "PENDING" ? "warning" : "success"}>
                                         {apt.status === "CONFIRMED" ? "Confirmada" : apt.status === "PENDING" ? "Pendiente" : "Completada"}
                                       </Badge>
-                                      {(apt.status === "CONFIRMED" || apt.status === "IN_PROGRESS") && (
+                                      {(apt.status === "CONFIRMED" || apt.status === "IN_PROGRESS") && isAppointmentJoinable(apt.scheduledAt, apt.durationMin) && (
                                         <Button size="sm" asChild>
                                           <Link href={`/call/${apt.id}`}>
                                             <Video className="w-4 h-4 mr-1" />
@@ -670,7 +683,7 @@ export default function SchedulePage() {
                                       <Badge variant={apt.status === "CONFIRMED" ? "default" : apt.status === "PENDING" ? "warning" : "success"}>
                                         {apt.status === "CONFIRMED" ? "Confirmada" : apt.status === "PENDING" ? "Pendiente" : "Completada"}
                                       </Badge>
-                                      {(apt.status === "CONFIRMED" || apt.status === "IN_PROGRESS") && (
+                                      {(apt.status === "CONFIRMED" || apt.status === "IN_PROGRESS") && isAppointmentJoinable(apt.scheduledAt, apt.durationMin) && (
                                         <Button size="sm" asChild>
                                           <Link href={`/call/${apt.id}`}>
                                             <Video className="w-4 h-4 mr-1" />
