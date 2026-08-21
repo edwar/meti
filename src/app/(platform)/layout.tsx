@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { LoadingPage } from "@/components/ui/loading";
 
 // This layout is only used for client dashboard pages
 // Admin and advisor have their own layouts with sidebars
@@ -50,7 +51,7 @@ export default function PlatformLayout({
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="loading-spinner" />
+        <LoadingPage label="Cargando..." />
       </div>
     );
   }

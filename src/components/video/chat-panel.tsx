@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useChat } from "@livekit/components-react";
-import { Send, MessageSquare } from "lucide-react";
+import { Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PersistedMessage {
@@ -18,15 +18,16 @@ interface ChatPanelProps {
   appointmentId: string;
   currentUserId: string;
   currentUserRole: "advisor" | "client";
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 // Panel de chat con persistencia en DB.
 // Los mensajes en vivo viajan por LiveKit; el historial se carga de la API.
-export function ChatPanel({ appointmentId, currentUserId, currentUserRole }: ChatPanelProps) {
+export function ChatPanel({ appointmentId, currentUserId, currentUserRole, isOpen, onToggle }: ChatPanelProps) {
   const { chatMessages, send } = useChat();
   const [dbMessages, setDbMessages] = useState<PersistedMessage[]>([]);
   const [input, setInput] = useState("");
-  const [isOpen, setIsOpen] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Cargar historial persistido
@@ -100,15 +101,7 @@ export function ChatPanel({ appointmentId, currentUserId, currentUserRole }: Cha
   };
 
   if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="absolute bottom-6 right-6 z-20 w-12 h-12 rounded-full bg-[var(--primary)] text-white shadow-lg flex items-center justify-center hover:bg-[var(--primary-hover)] transition-colors"
-        aria-label="Abrir chat"
-      >
-        <MessageSquare className="w-5 h-5" />
-      </button>
-    );
+    return null;
   }
 
   return (
@@ -116,7 +109,7 @@ export function ChatPanel({ appointmentId, currentUserId, currentUserRole }: Cha
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--border)] bg-[var(--surface)]">
         <p className="text-sm font-semibold text-[var(--text-primary)]">Chat de la asesoría</p>
-        <button onClick={() => setIsOpen(false)} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-lg leading-none">
+        <button onClick={onToggle} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-lg leading-none">
           ×
         </button>
       </div>
