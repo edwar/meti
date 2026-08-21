@@ -80,7 +80,6 @@ export async function GET() {
 
     // Citas confirmadas recientes (para notificaciones de nuevas reservas)
     // Solo citas futuras o de hoy
-    const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const recentAppointments = await prisma.appointment.findMany({
       where: {
