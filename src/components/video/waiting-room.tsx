@@ -10,10 +10,10 @@ import {
   User,
   Calendar,
   ArrowRight,
-  Loader2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { LoadingPage } from "../ui/loading";
 
 interface WaitingRoomProps {
   appointmentId: string;
@@ -89,8 +89,8 @@ export function WaitingRoom({ appointmentId, userRole, onJoin }: WaitingRoomProp
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-8 h-8 animate-spin text-[var(--primary)]" />
+      <div className="flex items-center justify-center min-h-[80vh]">
+        <LoadingPage label="Cargando sala de espera..." />
       </div>
     );
   }

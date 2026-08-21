@@ -1,20 +1,25 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   LiveKitRoom,
-  VideoConference,
-  ControlBar,
   LayoutContextProvider,
   RoomAudioRenderer,
+  ParticipantTile,
+  useTracks,
+  useConnectionState,
+  useRoomContext,
 } from "@livekit/components-react";
+import { ConnectionState, Track } from "livekit-client";
 import "@livekit/components-styles";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingPage } from "@/components/ui/loading";
 import { ChatPanel } from "@/components/video/chat-panel";
+import { CustomControlBar } from "@/components/video/custom-control-bar";
 import { TimeWarning } from "@/components/video/time-warning";
-import { VideoOff, Circle, Square } from "lucide-react";
+import { VideoOff } from "lucide-react";
 
 interface VideoCallProps {
   appointmentId: string;
@@ -28,13 +33,104 @@ interface AppointmentData {
   durationMin: number;
 }
 
+function CallContent({
+  appointmentId,
+  userRole,
+  userId,
+  appointment,
+}: {
+  appointmentId: string;
+  userRole: "advisor" | "client";
+  userId: string;
+  appointment: AppointmentData | null;
+}) {
+  const connectionState = useConnectionState();
+  const isConnected = connectionState === ConnectionState.Connected;
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const room = useRoomContext();
+  const router = useRouter();
+
+  const handleLeave = useCallback(() => {
+    room?.disconnect();
+    if (userRole === "client") {
+      router.push(`/dashboard/appointments/${appointmentId}/review`);
+    } else {
+      router.push("/advisor/schedule");
+    }
+  }, [room, userRole, appointmentId, router]);
+
+  const tracks = useTracks([
+    { source: Track.Source.Camera, withPlaceholder: true },
+    { source: Track.Source.ScreenShare, withPlaceholder: false },
+  ]);
+
+  if (!isConnected) {
+    return (
+      <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
+        <LoadingPage label="Conectando a la sala..." className="min-h-0" />
+      </div>
+    );
+  }
+
+  return (
+    <LayoutContextProvider>
+      <div className="h-full flex flex-col">
+        {/* Grid de participantes */}
+        <div className="flex-1 min-h-0 p-2">
+          <div
+            className={`h-full gap-2 ${tracks.length <= 1
+                ? "grid grid-cols-1"
+                : tracks.length <= 2
+                  ? "grid grid-cols-2"
+                  : "grid grid-cols-2 grid-rows-2"
+              }`}
+          >
+            {tracks.map((track, index) => (
+              <div key={`${track.source}-${track.participant?.identity ?? index}`} className="relative rounded-lg overflow-hidden bg-[var(--surface)]">
+                <ParticipantTile
+                  trackRef={track}
+                  className="h-full w-full"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Barra de controles */}
+        <CustomControlBar
+          onToggleChat={() => setIsChatOpen(!isChatOpen)}
+          isChatOpen={isChatOpen}
+          onLeave={handleLeave}
+        />
+
+        {/* Audio */}
+        <RoomAudioRenderer />
+      </div>
+
+      {/* Aviso de tiempo restante */}
+      {appointment && (
+        <TimeWarning
+          scheduledAt={appointment.scheduledAt}
+          durationMin={appointment.durationMin}
+        />
+      )}
+
+      <ChatPanel
+        appointmentId={appointmentId}
+        currentUserId={userId}
+        currentUserRole={userRole}
+        isOpen={isChatOpen}
+        onToggle={() => setIsChatOpen(!isChatOpen)}
+      />
+    </LayoutContextProvider>
+  );
+}
+
 export function VideoCall({ appointmentId, userRole, userName, userId }: VideoCallProps) {
   const [token, setToken] = useState<string | null>(null);
   const [roomUrl, setRoomUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingError, setRecordingError] = useState<string | null>(null);
   const [appointment, setAppointment] = useState<AppointmentData | null>(null);
 
   useEffect(() => {
@@ -83,42 +179,12 @@ export function VideoCall({ appointmentId, userRole, userName, userId }: VideoCa
     getToken();
   }, [appointmentId]);
 
-  const toggleRecording = useCallback(async () => {
-    setRecordingError(null);
-    try {
-      const method = isRecording ? "DELETE" : "POST";
-      const res = await fetch("/api/livekit/recording", {
-        method,
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ appointmentId }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al cambiar la grabación");
-      }
-      setIsRecording(!isRecording);
-    } catch (err: any) {
-      setRecordingError(err.message);
-    }
-  }, [appointmentId, isRecording]);
-
-  // Detener grabación al salir de la página
-  useEffect(() => {
-    return () => {
-      if (isRecording) {
-        fetch("/api/livekit/recording", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ appointmentId }),
-        }).catch(() => {});
-      }
-    };
-  }, [appointmentId, isRecording]);
-
   if (isLoading) {
-    return <LoadingPage />;
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <LoadingPage label="Preparando videollamada..." />
+      </div>
+    );
   }
 
   if (error) {
@@ -153,53 +219,12 @@ export function VideoCall({ appointmentId, userRole, userName, userId }: VideoCa
         data-lk-theme="default"
         style={{ height: "100%" }}
       >
-        <LayoutContextProvider>
-          <div className="h-full flex flex-col">
-            <div className="flex-1 min-h-0">
-              <VideoConference />
-            </div>
-            <RoomAudioRenderer />
-          </div>
-
-          {/* Botón de grabación */}
-          <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-            {recordingError && (
-              <span className="text-xs bg-[var(--error-light)] text-[var(--error)] px-2 py-1 rounded">
-                {recordingError}
-              </span>
-            )}
-            <Button
-              size="sm"
-              variant={isRecording ? "destructive" : "default"}
-              onClick={toggleRecording}
-              className="shadow-lg"
-            >
-              {isRecording ? (
-                <>
-                  <Square className="w-4 h-4 mr-1" /> Detener
-                </>
-              ) : (
-                <>
-                  <Circle className="w-4 h-4 mr-1 text-red-300" /> Grabar
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* Aviso de tiempo restante */}
-          {appointment && (
-            <TimeWarning
-              scheduledAt={appointment.scheduledAt}
-              durationMin={appointment.durationMin}
-            />
-          )}
-
-          <ChatPanel
-            appointmentId={appointmentId}
-            currentUserId={userId}
-            currentUserRole={userRole}
-          />
-        </LayoutContextProvider>
+        <CallContent
+          appointmentId={appointmentId}
+          userRole={userRole}
+          userId={userId}
+          appointment={appointment}
+        />
       </LiveKitRoom>
     </div>
   );

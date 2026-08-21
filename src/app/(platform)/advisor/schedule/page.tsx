@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -504,9 +505,9 @@ export default function SchedulePage() {
                               </div>
                             ))}
                             {apts.slice(0, 2).map((apt) => (
-                              <div key={apt.id} className={cn("text-[10px] px-1 py-0.5 rounded truncate", apt.status === "CONFIRMED" && "bg-[var(--primary)] text-white", apt.status === "PENDING" && "bg-[var(--warning)] text-white", apt.status === "COMPLETED" && "bg-[var(--success)] text-white")}>
+                              <Link key={apt.id} href={`/call/${apt.id}`} className={cn("block text-[10px] px-1 py-0.5 rounded truncate hover:opacity-80 transition-opacity", apt.status === "CONFIRMED" && "bg-[var(--primary)] text-white", apt.status === "PENDING" && "bg-[var(--warning)] text-white", apt.status === "COMPLETED" && "bg-[var(--success)] text-white")}>
                                 {format(new Date(apt.scheduledAt), "HH:mm")} {apt.client.name}
-                              </div>
+                              </Link>
                             ))}
                             {(blocked.length + apts.length) > 3 && (
                               <div className="text-[10px] text-[var(--text-muted)] pl-1">+{(blocked.length + apts.length) - 3} más</div>
@@ -551,11 +552,11 @@ export default function SchedulePage() {
                                   const aptStart = new Date(apt.scheduledAt);
                                   const topOffset = (getMinutes(aptStart) / 60) * 48;
 
-                                  return (
-                                    <div key={apt.id} className={cn("absolute inset-x-0.5 rounded text-xs px-1.5 py-1 overflow-hidden", apt.status === "CONFIRMED" && "bg-[var(--primary)] text-white", apt.status === "PENDING" && "bg-[var(--warning)] text-white", apt.status === "COMPLETED" && "bg-[var(--success)] text-white")} style={{ top: `${topOffset}px`, height: `${(apt.durationMin / 60) * 48}px` }}>
-                                      <div className="font-medium truncate">{apt.client.name}</div>
-                                    </div>
-                                  );
+                                    return (
+                                      <Link key={apt.id} href={`/call/${apt.id}`} className={cn("block absolute inset-x-0.5 rounded text-xs px-1.5 py-1 overflow-hidden hover:opacity-80 transition-opacity", apt.status === "CONFIRMED" && "bg-[var(--primary)] text-white", apt.status === "PENDING" && "bg-[var(--warning)] text-white", apt.status === "COMPLETED" && "bg-[var(--success)] text-white")} style={{ top: `${topOffset}px`, height: `${(apt.durationMin / 60) * 48}px` }}>
+                                        <div className="font-medium truncate">{apt.client.name}</div>
+                                      </Link>
+                                    );
                                 })}
                               </div>
                             );
@@ -599,9 +600,19 @@ export default function SchedulePage() {
                                       <div className="font-medium text-[var(--text-primary)]">{apt.client.name}</div>
                                       <div className="text-sm text-[var(--text-muted)]">{apt.service.name} • {format(aptStart, "HH:mm")} - {format(new Date(aptStart.getTime() + apt.durationMin * 60000), "HH:mm")}</div>
                                     </div>
-                                    <Badge variant={apt.status === "CONFIRMED" ? "default" : apt.status === "PENDING" ? "warning" : "success"}>
-                                      {apt.status === "CONFIRMED" ? "Confirmada" : apt.status === "PENDING" ? "Pendiente" : "Completada"}
-                                    </Badge>
+                                    <div className="flex items-center gap-2">
+                                      <Badge variant={apt.status === "CONFIRMED" ? "default" : apt.status === "PENDING" ? "warning" : "success"}>
+                                        {apt.status === "CONFIRMED" ? "Confirmada" : apt.status === "PENDING" ? "Pendiente" : "Completada"}
+                                      </Badge>
+                                      {(apt.status === "CONFIRMED" || apt.status === "IN_PROGRESS") && (
+                                        <Button size="sm" asChild>
+                                          <Link href={`/call/${apt.id}`}>
+                                            <Video className="w-4 h-4 mr-1" />
+                                            Unirse
+                                          </Link>
+                                        </Button>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
                               );
@@ -655,9 +666,19 @@ export default function SchedulePage() {
                                       <div className="font-medium text-[var(--text-primary)]">{apt.client.name}</div>
                                       <div className="text-sm text-[var(--text-muted)]">{apt.service.name} • {format(new Date(apt.scheduledAt), "HH:mm")} - {format(new Date(new Date(apt.scheduledAt).getTime() + apt.durationMin * 60000), "HH:mm")}</div>
                                     </div>
-                                    <Badge variant={apt.status === "CONFIRMED" ? "default" : apt.status === "PENDING" ? "warning" : "success"}>
-                                      {apt.status === "CONFIRMED" ? "Confirmada" : apt.status === "PENDING" ? "Pendiente" : "Completada"}
-                                    </Badge>
+                                    <div className="flex items-center gap-2">
+                                      <Badge variant={apt.status === "CONFIRMED" ? "default" : apt.status === "PENDING" ? "warning" : "success"}>
+                                        {apt.status === "CONFIRMED" ? "Confirmada" : apt.status === "PENDING" ? "Pendiente" : "Completada"}
+                                      </Badge>
+                                      {(apt.status === "CONFIRMED" || apt.status === "IN_PROGRESS") && (
+                                        <Button size="sm" asChild>
+                                          <Link href={`/call/${apt.id}`}>
+                                            <Video className="w-4 h-4 mr-1" />
+                                            Unirse
+                                          </Link>
+                                        </Button>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
                               ))}
