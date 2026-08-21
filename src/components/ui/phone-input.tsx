@@ -42,8 +42,10 @@ export function PhoneInput({
         setSelectedCountry(country);
         setLocalNumber(value.slice(country.dialCode.length));
       }
+    } else {
+      setLocalNumber("");
     }
-  }, []);
+  }, [value]);
 
   // Close dropdown on outside click
   useEffect(() => {
