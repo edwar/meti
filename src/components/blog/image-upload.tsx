@@ -26,6 +26,9 @@ export function ImageUpload({
     try {
       const formData = new FormData();
       formData.append("file", file);
+      if (value) {
+        formData.append("oldUrl", value);
+      }
 
       const response = await fetch("/api/admin/blog/upload", {
         method: "POST",

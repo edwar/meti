@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { del } from "@vercel/blob";
 
 // GET: Get single post for admin editing
 export async function GET(
@@ -137,6 +138,15 @@ export async function PUT(
       },
     });
 
+    // Delete old cover image blob if it changed
+    if (existingPost.coverImage && existingPost.coverImage !== coverImage) {
+      try {
+        await del(existingPost.coverImage);
+      } catch (deleteError) {
+        console.error("Error deleting old cover image:", deleteError);
+      }
+    }
+
     return NextResponse.json({ post });
   } catch (error) {
     console.error("Error updating blog post:", error);
@@ -175,6 +185,15 @@ export async function DELETE(
         { error: "Post not found" },
         { status: 404 }
       );
+    }
+
+    // Delete cover image blob if exists
+    if (existingPost.coverImage) {
+      try {
+        await del(existingPost.coverImage);
+      } catch (deleteError) {
+        console.error("Error deleting cover image blob:", deleteError);
+      }
     }
 
     await prisma.blogPost.delete({ where: { id } });

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { put } from "@vercel/blob";
+import { put, del } from "@vercel/blob";
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: NextRequest) {
@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
+    const oldUrl = formData.get("oldUrl") as string | null;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -43,6 +44,15 @@ export async function POST(request: NextRequest) {
       access: "public",
       contentType: file.type,
     });
+
+    // Delete old blob if replacing an existing image
+    if (oldUrl && oldUrl.startsWith("http")) {
+      try {
+        await del(oldUrl);
+      } catch (deleteError) {
+        console.error("Error deleting old avatar:", deleteError);
+      }
+    }
 
     return NextResponse.json({ url: blob.url }, { status: 201 });
   } catch (error) {
