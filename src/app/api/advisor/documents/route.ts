@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { put } from "@vercel/blob";
+import { put, del } from "@vercel/blob";
 import { v4 as uuidv4 } from "uuid";
 
 // POST: Upload verification document
@@ -127,6 +127,66 @@ export async function GET() {
     return NextResponse.json({ documents });
   } catch (error) {
     console.error("Error fetching documents:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE: Delete advisor document and its blob
+export async function DELETE(request: NextRequest) {
+  try {
+    const headersList = await headers();
+    const session = await auth.api.getSession({
+      headers: headersList,
+    });
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const advisorProfile = await prisma.advisorProfile.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (!advisorProfile) {
+      return NextResponse.json({ error: "Advisor profile not found" }, { status: 404 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const documentId = searchParams.get("id");
+
+    if (!documentId) {
+      return NextResponse.json({ error: "Document ID required" }, { status: 400 });
+    }
+
+    // Find the document and verify ownership
+    const document = await prisma.advisorDocument.findUnique({
+      where: { id: documentId },
+    });
+
+    if (!document || document.advisorId !== advisorProfile.id) {
+      return NextResponse.json({ error: "Document not found" }, { status: 404 });
+    }
+
+    // Delete the blob from Vercel Blob storage
+    if (document.fileUrl && document.fileUrl.startsWith("http")) {
+      try {
+        await del(document.fileUrl);
+      } catch (deleteError) {
+        console.error("Error deleting blob:", deleteError);
+      }
+    }
+
+    // Delete the document record
+    await prisma.advisorDocument.delete({
+      where: { id: documentId },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting document:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
