@@ -42,15 +42,14 @@ export const metadata: Metadata = {
     siteName: "Meti",
     type: "website",
     url: "https://meti.cognilab.dev",
-    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Meti - Asesorías Profesionales Online",
     description:
       "Conecta con asesores profesionales en línea. Videollamadas, chat y gestión completa de asesorías.",
-    images: ["/og-image.png"],
   },
+  metadataBase: new URL("https://meti.cognilab.dev"),
 };
 
 export default function RootLayout({
