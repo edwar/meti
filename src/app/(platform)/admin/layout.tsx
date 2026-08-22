@@ -16,6 +16,7 @@ import {
   X,
   Shield,
   CheckCircle,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -42,6 +43,11 @@ const navigation = [
     name: "Usuarios",
     href: "/admin/users",
     icon: Users,
+  },
+  {
+    name: "Blog",
+    href: "/admin/blog",
+    icon: BookOpen,
   },
   {
     name: "Facturación",
