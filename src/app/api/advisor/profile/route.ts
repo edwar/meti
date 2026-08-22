@@ -5,6 +5,8 @@ import { headers } from "next/headers";
 import { z } from "zod";
 
 const profileSchema = z.object({
+  name: z.string().min(1).optional(),
+  image: z.string().url().optional().or(z.literal("")),
   bio: z.string().optional(),
   speciality: z.string().optional(),
   videoUrl: z.string().url().optional().or(z.literal("")),
@@ -108,7 +110,19 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const validatedData = profileSchema.parse(body);
 
-    // Actualizar perfil
+    // Actualizar campos de User (name, image)
+    const userUpdates: Record<string, string> = {};
+    if (validatedData.name !== undefined) userUpdates.name = validatedData.name;
+    if (validatedData.image !== undefined) userUpdates.image = validatedData.image || "";
+
+    if (Object.keys(userUpdates).length > 0) {
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: userUpdates,
+      });
+    }
+
+    // Actualizar perfil de asesor
     await prisma.advisorProfile.update({
       where: { id: advisorProfile.id },
       data: {
@@ -147,10 +161,13 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    // Retornar perfil actualizado con categorías
+    // Retornar perfil actualizado con categorías y datos de usuario
     const updated = await prisma.advisorProfile.findUnique({
       where: { id: advisorProfile.id },
       include: {
+        user: {
+          select: { name: true, email: true, image: true },
+        },
         categories: { include: { category: true } },
       },
     });
