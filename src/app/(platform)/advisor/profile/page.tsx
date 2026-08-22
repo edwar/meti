@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,8 @@ import {
   Eye,
   EyeOff,
   Phone,
+  Camera,
+  X,
 } from "lucide-react";
 import "lite-youtube-embed/src/lite-yt-embed.css";
 import { sileo } from "sileo";
@@ -32,7 +34,11 @@ export default function ProfilePage() {
   const dialog = useDialog();
   const { data, isLoading } = useAdvisorProfile();
   const updateProfile = useUpdateProfile();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [name, setName] = useState("");
+  const [image, setImage] = useState("");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [bio, setBio] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
@@ -47,6 +53,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (data?.profile) {
+      setName(data.profile.user?.name || "");
+      setImage(data.profile.user?.image || "");
       setBio(data.profile.bio || "");
       setVideoUrl(data.profile.videoUrl || "");
       setBookingLeadHours(data.profile.bookingLeadHours || 24);
@@ -75,6 +83,47 @@ export default function ProfilePage() {
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
     );
     setHasChanges(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload/avatar", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setImage(data.url);
+        setHasChanges(true);
+      } else {
+        const data = await res.json();
+        dialog.showAlert("Error", data.error || "Error al subir la imagen", "error");
+      }
+    } catch (error) {
+      dialog.showAlert("Error", "Error de conexión", "error");
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImage("");
+    setHasChanges(true);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const fetchDocuments = async () => {
@@ -122,7 +171,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     updateProfile.mutate(
-      { bio, videoUrl: videoUrl || undefined, categoryIds: selectedCategoryIds, bookingLeadHours, whatsappPhone: whatsappPhone || undefined },
+      { name, image, bio, videoUrl: videoUrl || undefined, categoryIds: selectedCategoryIds, bookingLeadHours, whatsappPhone: whatsappPhone || undefined },
       {
         onSuccess: () => {
           setHasChanges(false);
@@ -197,24 +246,53 @@ export default function ProfilePage() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-start gap-6">
-                  {profile.user.image ? (
-                    <img
-                      src={profile.user.image}
-                      alt={profile.user.name}
-                      className="w-20 h-20 rounded-full object-cover flex-shrink-0"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 rounded-full bg-[var(--primary-light)] flex items-center justify-center flex-shrink-0">
-                      <span className="text-2xl font-bold text-[var(--primary)]">
-                        {profile.user.name?.charAt(0) || "?"}
-                      </span>
+                  {/* Editable Avatar */}
+                  <div className="relative group flex-shrink-0">
+                    <div className="w-20 h-20 rounded-full bg-[var(--primary-light)] flex items-center justify-center overflow-hidden">
+                      {image ? (
+                        <img
+                          src={image}
+                          alt={name}
+                          className="w-20 h-20 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-2xl font-bold text-[var(--primary)]">
+                          {name?.charAt(0) || "?"}
+                        </span>
+                      )}
                     </div>
-                  )}
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploadingImage}
+                      className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                    >
+                      {isUploadingImage ? (
+                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      ) : (
+                        <Camera className="w-5 h-5 text-white" />
+                      )}
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h2 className="font-heading text-xl font-bold text-[var(--text-primary)]">
-                        {profile.user.name}
-                      </h2>
+                    {/* Editable Name */}
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={name}
+                        onChange={(e) => {
+                          setName(e.target.value);
+                          setHasChanges(true);
+                        }}
+                        placeholder="Tu nombre"
+                        className="font-heading text-xl font-bold"
+                      />
                       <VerifiedBadge
                         isVerified={profile.isVerified}
                         verificationStatus={profile.verificationStatus}
@@ -234,6 +312,16 @@ export default function ProfilePage() {
                           </Badge>
                         ))}
                       </div>
+                    )}
+                    {image && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="text-xs text-[var(--error)] hover:underline mt-2 flex items-center gap-1"
+                      >
+                        <X className="w-3 h-3" />
+                        Eliminar foto
+                      </button>
                     )}
                   </div>
                 </div>

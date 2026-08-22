@@ -1,20 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LoadingPage } from "@/components/ui/loading";
-import { User, Mail, Save } from "lucide-react";
+import { User, Mail, Save, Camera, X } from "lucide-react";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [name, setName] = useState("");
+  const [image, setImage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -26,6 +29,7 @@ export default function ProfilePage() {
         }
         setUser(data.user);
         setName(data.user.name || "");
+        setImage(data.user.image || "");
       } catch (error) {
         router.push("/login");
       } finally {
@@ -36,11 +40,68 @@ export default function ProfilePage() {
     checkSession();
   }, [router]);
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload/avatar", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setImage(data.url);
+      } else {
+        const data = await res.json();
+        alert(data.error || "Error al subir la imagen");
+      }
+    } catch (error) {
+      alert("Error de conexión");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImage("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
-    // TODO: Implement save profile
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSaving(false);
+    try {
+      const res = await fetch("/api/client/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name, image }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        alert("Perfil actualizado correctamente");
+      } else {
+        const data = await res.json();
+        alert(data.error || "Error al actualizar perfil");
+      }
+    } catch (error) {
+      alert("Error de conexión");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (isLoading) return <LoadingPage />;
@@ -71,32 +132,63 @@ export default function ProfilePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Avatar */}
           <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-[var(--primary-light)] flex items-center justify-center">
-                {user.image ? (
+            <div className="relative group">
+              <div className="w-20 h-20 rounded-full bg-[var(--primary-light)] flex items-center justify-center overflow-hidden">
+                {image ? (
                   <img
-                    src={user.image}
-                    alt={user.name}
-                    className="w-20 h-20 rounded-full"
+                    src={image}
+                    alt={name}
+                    className="w-20 h-20 rounded-full object-cover"
                   />
                 ) : (
                   <span className="text-2xl font-bold text-[var(--primary)]">
-                    {user.name?.charAt(0) || "?"}
+                    {name?.charAt(0) || "?"}
                   </span>
                 )}
               </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+              >
+                {isUploading ? (
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : (
+                  <Camera className="w-5 h-5 text-white" />
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
             </div>
-            <div>
+            <div className="flex-1">
               <p className="font-medium text-[var(--text-primary)]">
                 Foto de perfil
               </p>
               <p className="text-sm text-[var(--text-muted)]">
-                Se sincroniza con tu cuenta de Google
+                JPEG, PNG o WebP (máx. 2MB)
               </p>
+              {image && (
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="text-sm text-[var(--error)] hover:underline mt-1 flex items-center gap-1"
+                >
+                  <X className="w-3 h-3" />
+                  Eliminar foto
+                </button>
+              )}
             </div>
           </div>
 
+          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
               Nombre
@@ -108,6 +200,7 @@ export default function ProfilePage() {
             />
           </div>
 
+          {/* Email (read-only) */}
           <div>
             <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
               Email
@@ -118,7 +211,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button onClick={handleSave} disabled={isSaving || isUploading}>
             <Save className="w-4 h-4 mr-2" />
             {isSaving ? "Guardando..." : "Guardar cambios"}
           </Button>
