@@ -30,6 +30,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   appointments  Appointment[] @relation("ClientAppointments")
+  blogPosts     BlogPost[]
 
   @@map("users")
 }
@@ -461,4 +462,32 @@ model PlatformConfig {
   updatedAt         DateTime @updatedAt
 
   @@map("platform_configs")
+}
+
+// ============================================
+// BLOG
+// ============================================
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model BlogPost {
+  id            String     @id @default(cuid())
+  title         String
+  slug          String     @unique
+  excerpt       String?    @db.Text
+  content       String     @db.Text
+  coverImage    String?
+  authorId      String
+  status        BlogStatus @default(DRAFT)
+  publishedAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  author        User       @relation(fields: [authorId], references: [id])
+
+  @@index([status, publishedAt])
+  @@map("blog_posts")
 }
