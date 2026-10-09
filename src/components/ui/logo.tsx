@@ -15,7 +15,7 @@ export function Logo({ className }: { className?: string }) {
         x="20"
         y="33"
         textAnchor="middle"
-        fill="#fff"
+        fill="#16100d"
         fontFamily="system-ui,sans-serif"
         fontWeight="800"
         fontSize="24"

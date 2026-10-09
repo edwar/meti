@@ -27,8 +27,8 @@ const steps = [
     title: "Conecta",
     description:
       "Únete a la videollamada al momento acordado. Comparte documentos por chat si es necesario.",
-    color: "#8b5cf6",
-    bgColor: "#ede9fe",
+    color: "#a78bfa",
+    bgColor: "rgba(167, 139, 250, 0.14)",
   },
   {
     icon: Star,
@@ -74,7 +74,7 @@ export function HowItWorks() {
                     <step.icon className="w-10 h-10" style={{ color: step.color }} />
                   </div>
                   <span
-                    className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg"
+                    className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-[#0c0c0f] shadow-lg tabular"
                     style={{ backgroundColor: step.color }}
                   >
                     {step.number}

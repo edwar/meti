@@ -12,6 +12,7 @@
   --primary-hover: #e55a2b;
   --primary-light: #fff3ed;
   --primary-dark: #cc5229;
+  --on-primary: #ffffff;
 
   /* Secondary Colors */
   --secondary: #1a1a2e;
@@ -23,10 +24,12 @@
   --accent-hover: #00b894;
   --accent-light: #e6faf5;
   --accent-dark: #00a88a;
+  --on-accent: #04130f;
 
   /* Neutral Colors */
   --background: #fafafa;
   --surface: #ffffff;
+  --surface-raised: #ffffff;
   --border: #e5e7eb;
   --border-light: #f3f4f6;
   --text-primary: #1a1a2e;
@@ -52,9 +55,9 @@
   --star-empty: #e5e7eb;
 
   /* Fonts */
-  --font-sans: var(--font-inter);
-  --font-heading: var(--font-plus-jakarta);
-  --font-mono: var(--font-jetbrains);
+  --font-sans: var(--font-geist);
+  --font-heading: var(--font-bricolage);
+  --font-mono: var(--font-geist-mono);
 
   /* Spacing */
   --radius-sm: 6px;
@@ -85,56 +88,65 @@
    ============================================ */
 
 .dark {
+  color-scheme: dark;
+
   --primary: #ff7a47;
-  --primary-hover: #ff8f63;
-  --primary-light: rgba(255, 107, 53, 0.16);
-  --primary-dark: #cc5229;
+  --primary-hover: #ff9368;
+  --primary-light: rgba(255, 122, 71, 0.14);
+  --primary-dark: #e5602f;
+  --on-primary: #16100d;
 
-  --secondary: #12121f;
-  --secondary-light: #1e1e33;
-  --secondary-dark: #0a0a12;
+  --secondary: #0d0d10;
+  --secondary-light: #1a1a20;
+  --secondary-dark: #070709;
 
-  --accent: #00e0b4;
-  --accent-hover: #2ce6c4;
-  --accent-light: rgba(0, 212, 170, 0.14);
-  --accent-dark: #00a88a;
+  --accent: #2de2bd;
+  --accent-hover: #5cecce;
+  --accent-light: rgba(45, 226, 189, 0.12);
+  --accent-dark: #14b894;
+  --on-accent: #04130f;
 
-  --background: #0b0b14;
-  --surface: #15151f;
-  --border: #26263a;
-  --border-light: #1d1d2b;
-  --text-primary: #f2f2f8;
-  --text-secondary: #b9b9cc;
-  --text-muted: #85859c;
+  /* Escalera de superficies: fondo < superficie < elevada */
+  --background: #09090b;
+  --surface: #111114;
+  --surface-raised: #18181d;
+  --border: #2a2a32;
+  --border-light: #1c1c22;
+  --text-primary: #f6f6f8;
+  --text-secondary: #cdcdd6;
+  --text-muted: #9d9daa;
 
-  --success: #34d399;
-  --success-light: rgba(16, 185, 129, 0.16);
-  --success-dark: #059669;
+  --success: #3ddc97;
+  --success-light: rgba(61, 220, 151, 0.14);
+  --success-dark: #1fa971;
   --warning: #fbbf24;
-  --warning-light: rgba(245, 158, 11, 0.16);
-  --warning-dark: #d97706;
-  --error: #f87171;
-  --error-light: rgba(239, 68, 68, 0.16);
-  --error-dark: #dc2626;
-  --info: #60a5fa;
-  --info-light: rgba(59, 130, 246, 0.16);
-  --info-dark: #2563eb;
+  --warning-light: rgba(251, 191, 36, 0.14);
+  --warning-dark: #d99a06;
+  --error: #ff7b7b;
+  --error-light: rgba(255, 123, 123, 0.14);
+  --error-dark: #e04848;
+  --info: #6aa9ff;
+  --info-light: rgba(106, 169, 255, 0.14);
+  --info-dark: #3d85ee;
 
   --star: #fbbf24;
-  --star-empty: #2d2d44;
+  --star-empty: #34343e;
 
-  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.45), 0 2px 4px -2px rgb(0 0 0 / 0.4);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.55), 0 8px 10px -6px rgb(0 0 0 / 0.45);
-  --shadow-primary: 0 4px 14px 0 rgb(255 107 53 / 0.25);
-  --shadow-accent: 0 4px 14px 0 rgb(0 212 170 / 0.25);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 1px 3px 0 rgb(0 0 0 / 0.5);
+  --shadow-md: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 6px 16px -4px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 1px 0 0 rgb(255 255 255 / 0.05) inset, 0 16px 32px -8px rgb(0 0 0 / 0.7);
+  --shadow-xl: 0 24px 48px -12px rgb(0 0 0 / 0.75);
+  --shadow-primary: 0 0 0 1px rgb(255 122 71 / 0.5), 0 6px 24px -2px rgb(255 107 53 / 0.45);
+  --shadow-accent: 0 6px 24px -2px rgb(45 226 189 / 0.35);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-on-primary: var(--on-primary);
+  --color-on-accent: var(--on-accent);
   --color-border: var(--border);
   --color-border-light: var(--border-light);
 
@@ -172,9 +184,9 @@
   --color-star: var(--star);
   --color-star-empty: var(--star-empty);
 
-  --font-sans: var(--font-inter);
-  --font-heading: var(--font-plus-jakarta);
-  --font-mono: var(--font-jetbrains);
+  --font-sans: var(--font-geist);
+  --font-heading: var(--font-bricolage);
+  --font-mono: var(--font-geist-mono);
 }
 
 /* ============================================
@@ -213,7 +225,12 @@ h6 {
   font-family: var(--font-heading), system-ui, sans-serif;
   font-weight: 700;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+}
+
+/* Numeros alineados en precios, horas y metricas */
+.tabular, [data-tabular] {
+  font-variant-numeric: tabular-nums;
 }
 
 /* ============================================
@@ -445,7 +462,7 @@ h6 {
 /* Button enhancements */
 .btn-primary {
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   font-weight: 600;
   padding: 0.625rem 1.25rem;
   border-radius: var(--radius-md);
@@ -587,7 +604,7 @@ h6 {
    ============================================ */
 
 ::selection {
-  background: rgba(255, 107, 53, 0.2);
+  background: rgba(255, 122, 71, 0.35);
   color: var(--text-primary);
 }
 
@@ -604,4 +621,40 @@ h6 {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ============================================
+   PERSONALIDAD: fondos con textura y brillo
+   ============================================ */
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+}
+
+:root:not(.dark) .bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(0 0 0 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(0 0 0 / 0.05) 1px, transparent 1px);
+}
+
+/* Etiqueta tecnica pequena, estilo consola */
+.eyebrow {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+/* Franja diagonal para horarios no disponibles (agenda) */
+.hatch {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 6px,
+    rgb(255 255 255 / 0.035) 6px 7px
+  );
 }

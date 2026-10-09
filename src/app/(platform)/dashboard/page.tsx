@@ -95,24 +95,24 @@ export default function DashboardPage() {
       </div>
 
       {/* CTA to become advisor */}
-      <Card className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white">
+      <Card className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-[var(--on-accent)]">
         <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <h3 className="font-heading font-semibold text-lg mb-1">
               ¿Eres profesional?
             </h3>
-            <p className="text-white/90">
+            <p className="text-[var(--on-accent)]/85">
               Ofrece tus asesorías y genera ingresos con Meti
             </p>
           </div>
           <Button
-            className="bg-white text-[var(--accent)] hover:bg-white/90"
+            className="bg-[var(--background)] text-[var(--text-primary)] hover:bg-[var(--surface-raised)]"
             onClick={handleBecomeAdvisor}
             disabled={isRequesting}
           >
             {isRequesting ? (
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-[var(--text-primary)] border-t-transparent rounded-full animate-spin" />
                 Procesando...
               </div>
             ) : (

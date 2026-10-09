@@ -39,8 +39,8 @@ const categories = [
   {
     name: "Tecnología",
     icon: Cpu,
-    color: "#8b5cf6",
-    bgColor: "#ede9fe",
+    color: "#a78bfa",
+    bgColor: "rgba(167, 139, 250, 0.14)",
     description: "IT, marketing digital, desarrollo",
     count: 56,
   },
@@ -55,8 +55,8 @@ const categories = [
   {
     name: "Negocios",
     icon: Briefcase,
-    color: "var(--secondary)",
-    bgColor: "rgba(26, 26, 46, 0.1)",
+    color: "var(--info)",
+    bgColor: "var(--info-light)",
     description: "Consultoría empresarial, emprendimiento",
     count: 41,
   },
@@ -84,7 +84,7 @@ export function Categories() {
               className="group"
             >
               <div
-                className="p-6 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full"
+                className="p-6 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-center hover:border-[var(--primary)]/60 hover:bg-[var(--surface-raised)] hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div

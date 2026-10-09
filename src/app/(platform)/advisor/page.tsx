@@ -236,12 +236,12 @@ export default function AdvisorDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] text-white">
+          <Card className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] text-[var(--on-primary)]">
             <CardContent className="p-6">
               <h3 className="font-heading font-semibold mb-2">
                 💡 Consejo del día
               </h3>
-              <p className="text-sm text-white/90">
+              <p className="text-sm text-[var(--on-primary)]/85">
                 Completa tu perfil con un video de presentación para atraer más
                 clientes. Los asesores con video reciben 3x más reservas.
               </p>

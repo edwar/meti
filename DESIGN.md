@@ -21,50 +21,34 @@ Meti habita en el mundo de la **confianza activa** — donde la sabiduría profe
 
 ## Color Strategy
 
-**Full Palette — Energético y Bold**
+**Dark-first, alto contraste.** Escena: profesionales y clientes frente a pantallas durante largas sesiones; el fondo oscuro da carácter y reduce la fatiga visual. El tema claro sigue disponible con el toggle, pero el tema por defecto es oscuro (sin seguir el sistema).
 
 ```
-Primary:    #FF6B35 (Naranja Vibrante) — Acción, energía, CTA principal
-Secondary:  #1A1A2E (Azul Profundo) — Confianza, autoridad, headers
-Accent:     #00D4AA (Turquesa) — Éxito, confirmación, positividad
+Fondo:          #09090b   (background)
+Superficie:     #111114   (cards, sidebars)
+Elevada:        #18181d   (hover, popovers, tarjetas flotantes)
+Borde:          #2a2a32   (hairlines; la profundidad la dan bordes, no sombras)
+Texto:          #f6f6f8 / #cdcdd6 / #9d9daa  (primario / secundario / apagado, todos AA)
 
-Neutral BG:     #FAFAFA
-Neutral Surface: #FFFFFF
-Neutral Border:  #E5E7EB
-Text Primary:    #1A1A2E
-Text Muted:      #6B7280
-
-Semantic:
-  Success: #10B981
-  Warning: #F59E0B
-  Error:   #EF4444
-  Star:    #FBBF24
+Primario:       #ff7a47 (naranja) — acción y marca; texto SOBRE primario = #16100d (--on-primary), nunca blanco
+Acento:         #2de2bd (turquesa) — disponibilidad, éxito; texto sobre acento = --on-accent
+Semánticos:     success #3ddc97, warning #fbbf24, error #ff7b7b, info #6aa9ff
 ```
 
-**Light mode only en MVP** (escena: profesionales trabajando en interiores, luz natural, pantallas). Dark mode post-MVP.
+Reglas: superficies en escalera (fondo < superficie < elevada); un solo color de acción por vista; los bloques sólidos naranja (CTA) llevan texto oscuro.
 
 ## Typography
 
-**Headlines:** Plus Jakarta Sans (Bold, Extrabold)
-- Razón: Moderno, geométrico, tiene presencia sin ser agresivo. Funciona bien en tamaños grandes y pequeños.
+- **Títulos:** Bricolage Grotesque (600–800) — carácter propio, tracking ajustado.
+- **Cuerpo / UI:** Geist.
+- **Datos (horas, etiquetas, precios técnicos):** Geist Mono; clase `.eyebrow` para etiquetas y `.tabular` para cifras alineadas.
 
-**Body:** Inter (Regular, Medium)
-- Razón: Excelente legibilidad, amplio soporte, familiar para usuarios tech.
+Escala: Display 56–72px, H1 40px, H2 32px, H3 24px, cuerpo 16px, small 14px, caption 12px.
 
-**Monospace (precios, datos):** JetBrains Mono
-- Razón: Claridad numérica, asociación con transparencia y datos.
+## Signature Motifs
 
-**Scale:**
-```
-Display:    3.5rem / 4rem (56px / 64px)
-H1:         2.5rem / 3rem (40px / 48px)
-H2:         2rem / 2.5rem (32px / 40px)
-H3:         1.5rem / 2rem (24px / 32px)
-Body Large: 1.125rem (18px)
-Body:       1rem (16px)
-Small:      0.875rem (14px)
-Caption:    0.75rem (12px)
-```
+- Fondo con rejilla fina (`.bg-grid`) y resplandor naranja/turquesa en el hero.
+- Agenda como lenguaje visual: franjas diagonales (`.hatch`) para horarios no disponibles, citas con borde izquierdo naranja.
 
 ## Component Language
 
