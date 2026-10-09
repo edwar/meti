@@ -12,7 +12,7 @@ const Card = React.forwardRef<
     className={cn(
       "rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-sm transition-all duration-200",
       interactive &&
-        "cursor-pointer hover:shadow-lg hover:-translate-y-0.5 hover:border-[var(--primary)] active:translate-y-0 active:shadow-sm",
+        "cursor-pointer hover:shadow-lg hover:-translate-y-0.5 hover:border-[var(--primary)]/70 hover:bg-[var(--surface-raised)] active:translate-y-0 active:shadow-sm",
       className
     )}
     {...props}

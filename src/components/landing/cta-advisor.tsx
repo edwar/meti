@@ -31,7 +31,7 @@ export function CTAAdvisor() {
   return (
     <section
       id="para-asesores"
-      className="py-20 bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] text-white overflow-hidden relative"
+      className="py-20 bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] text-[var(--on-primary)] overflow-hidden relative"
     >
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-10">
@@ -46,7 +46,7 @@ export function CTAAdvisor() {
             <h2 className="font-heading text-3xl md:text-4xl font-bold mb-6">
               ¿Eres profesional? Ofrece tus asesorías con Meti
             </h2>
-            <p className="text-lg text-white/90 mb-8">
+            <p className="text-lg text-[var(--on-primary)]/85 mb-8">
               Únete a nuestra plataforma y llega a clientes que buscan tu
               experiencia. Tú defines tus precios, horarios y condiciones. Nosotros
               nos encargamos de la tecnología.
@@ -59,10 +59,10 @@ export function CTAAdvisor() {
                   className="flex items-center gap-3 animate-fade-in-left"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-black/15 flex items-center justify-center flex-shrink-0">
                     <benefit.icon className="w-4 h-4" />
                   </div>
-                  <span className="text-white/95">{benefit.text}</span>
+                  <span className="text-[var(--on-primary)]">{benefit.text}</span>
                 </li>
               ))}
             </ul>
@@ -70,7 +70,7 @@ export function CTAAdvisor() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 size="lg"
-                className="bg-white text-[var(--primary)] hover:bg-white/90 shadow-lg hover:shadow-xl"
+                className="bg-[var(--background)] text-[var(--text-primary)] hover:bg-[var(--surface-raised)] shadow-lg"
                 asChild
               >
                 <Link href="/register">
@@ -81,7 +81,7 @@ export function CTAAdvisor() {
               <Button
                 size="lg"
                 variant="secondary"
-                className="border-white text-white hover:bg-white/10"
+                className="border-[var(--on-primary)] text-[var(--on-primary)] hover:bg-black/10 hover:text-[var(--on-primary)]"
                 asChild
               >
                 <Link href="#como-funciona">Saber más</Link>
@@ -91,9 +91,9 @@ export function CTAAdvisor() {
 
           {/* Visual */}
           <div className="relative hidden lg:block">
-            <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 animate-fade-in-right">
+            <div className="relative bg-black/15 rounded-2xl p-8 border border-black/10 animate-fade-in-right">
               {/* Mock advisor card */}
-              <div className="bg-white rounded-xl p-6 shadow-2xl">
+              <div className="bg-[var(--surface)] rounded-xl p-6 shadow-2xl">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 rounded-full bg-[var(--primary-light)] flex items-center justify-center">
                     <span className="text-2xl font-bold text-[var(--primary)]">JP</span>
@@ -128,10 +128,10 @@ export function CTAAdvisor() {
               </div>
 
               {/* Floating badges */}
-              <div className="absolute -top-4 -right-4 bg-[var(--accent)] text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg animate-float">
+              <div className="absolute -top-4 -right-4 bg-[var(--accent)] text-[var(--on-accent)] px-4 py-2 rounded-full text-sm font-semibold shadow-lg animate-float">
                 100% Online
               </div>
-              <div className="absolute -bottom-4 -left-4 bg-[var(--secondary)] text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg animate-float" style={{ animationDelay: "1s" }}>
+              <div className="absolute -bottom-4 -left-4 bg-[var(--background)] text-[var(--text-primary)] px-4 py-2 rounded-full text-sm font-semibold shadow-lg animate-float" style={{ animationDelay: "1s" }}>
                 Pago seguro
               </div>
             </div>

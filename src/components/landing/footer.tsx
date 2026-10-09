@@ -24,7 +24,7 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="bg-[var(--secondary)] text-white">
+    <footer className="bg-[var(--secondary)] text-white border-t border-[var(--border)]">
       <div className="container-meti py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           {/* Brand */}

@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] focus-visible:ring-[var(--primary)] shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:shadow-xs",
+          "bg-[var(--primary)] text-[var(--on-primary)] hover:bg-[var(--primary-hover)] focus-visible:ring-[var(--primary)] shadow-sm hover:shadow-[var(--shadow-primary)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-xs",
         secondary:
           "bg-transparent text-[var(--secondary)] border-[1.5px] border-[var(--secondary)] hover:bg-[var(--secondary)] hover:text-white focus-visible:ring-[var(--secondary)] active:bg-[var(--secondary-dark)] dark:text-[var(--text-primary)] dark:border-[var(--border)] dark:hover:bg-[var(--border)] dark:hover:text-[var(--text-primary)] dark:active:bg-[var(--border-light)] dark:focus-visible:ring-[var(--primary)]",
         ghost:
@@ -20,7 +20,7 @@ const buttonVariants = cva(
         success:
           "bg-[var(--success)] text-white hover:bg-[var(--success-dark)] focus-visible:ring-[var(--success)] shadow-sm hover:shadow-md",
         outline:
-          "bg-transparent text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--background)] hover:border-[var(--text-muted)] focus-visible:ring-[var(--primary)]",
+          "bg-transparent text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--surface-raised)] hover:border-[var(--text-muted)] focus-visible:ring-[var(--primary)]",
       },
       size: {
         default: "h-10 px-5 py-2.5",
